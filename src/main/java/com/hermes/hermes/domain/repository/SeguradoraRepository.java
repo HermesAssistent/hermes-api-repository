@@ -1,6 +1,6 @@
 package com.hermes.hermes.domain.repository;
 
-import com.hermes.hermes.domain.model.Seguradora;
+import com.hermes.hermes.domain.model.seguradora.Seguradora;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

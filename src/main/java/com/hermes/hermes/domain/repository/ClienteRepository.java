@@ -1,6 +1,6 @@
 package com.hermes.hermes.domain.repository;
 
-import com.hermes.hermes.domain.model.Cliente;
+import com.hermes.hermes.domain.model.cliente.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
