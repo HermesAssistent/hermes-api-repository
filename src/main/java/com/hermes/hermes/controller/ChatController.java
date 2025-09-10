@@ -1,36 +1,40 @@
 package com.hermes.hermes.controller;
 
-import com.hermes.hermes.controller.dto.MessageDto;
+import com.hermes.hermes.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping(value = "v1/chat")
 @RequiredArgsConstructor
 public class ChatController {
+    private final ChatService chatService;
 
-
-    @PostMapping("/estabelecer-conexao")
-    public ResponseEntity<HttpStatus> estabelecerConexao(Long userId){
-        return ResponseEntity.ok(HttpStatus.OK);
+    @PostMapping("/iniciar")
+    public Map iniciar(@RequestParam String userId) {
+        return chatService.iniciarChat(userId);
     }
 
-    @PostMapping("/receber-mensagem/{userId}")
-    public ResponseEntity<String> sendMessage(@PathVariable("userId") Long userId, @RequestBody MessageDto message) throws InterruptedException {
-        List<String> mensagens = new ArrayList<>();
+    @PostMapping("/processar")
+    public Map processar(
+            @RequestParam String userId,
+            @RequestParam String texto
+    ) {
+        return chatService.processarMensagem(userId, texto);
+    }
 
-        //todo: implementar comunicacao com api python aqui
-        mensagens.add("Mensagem recebida com sucesso!");
-        Thread.sleep(3000L);
+    @GetMapping("/sessoes")
+    public Map listarSessoes() {
+        return chatService.listarSessoes();
+    }
 
-        return ResponseEntity.ok(mensagens.getFirst());
+    @DeleteMapping("/limpar/{userId}")
+    public Map limpar(@PathVariable String userId) {
+        return chatService.limparSessao(userId);
     }
 
 }
