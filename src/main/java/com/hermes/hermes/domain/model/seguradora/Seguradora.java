@@ -15,8 +15,6 @@ public class Seguradora extends Usuario {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seg_seguradora_seq")
     @SequenceGenerator(name = "seg_seguradora_seq", sequenceName = "seg_seguradora_seq", allocationSize = 1)
     private Long id;
-    @Column(nullable = false)
-    private String nome;
     @Column(nullable = false, unique = true, length = 14)
     private String cnpj;
     private String contato;
