@@ -1,5 +1,6 @@
 package com.hermes.hermes.domain.model.chat;
 
+import com.hermes.hermes.domain.model.abstracts.Entidade;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatSession {
+public class ChatSession extends Entidade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

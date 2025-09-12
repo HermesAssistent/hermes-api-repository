@@ -39,6 +39,16 @@ public class ChatController {
         }
     }
 
+    @PostMapping("/receber-relato")
+    public void receberRelato(@RequestParam Object userId) {
+        try {
+            System.out.println("relato" + userId);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao iniciar chat");
+        }
+    }
+
     @PostMapping("/processar")
     public Map processar(
             @RequestParam Long userId,
@@ -72,5 +82,6 @@ public class ChatController {
         }
 
     }
+
 
 }

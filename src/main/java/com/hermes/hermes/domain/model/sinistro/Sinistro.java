@@ -1,41 +1,100 @@
 package com.hermes.hermes.domain.model.sinistro;
 
-import com.hermes.hermes.domain.enums.StatusSinistro;
 import com.hermes.hermes.domain.model.abstracts.Entidade;
 import com.hermes.hermes.domain.model.cliente.Cliente;
-import com.hermes.hermes.domain.model.oficina.Oficina;
-import com.hermes.hermes.domain.model.seguradora.Seguradora;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
+import java.util.LinkedHashMap;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@Entity
 public class Sinistro extends Entidade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sin_sinistro_seq")
     @SequenceGenerator(name = "sin_sinistro_seq", sequenceName = "sin_sinistro_seq", allocationSize = 1)
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seguradora_id")
-    private Seguradora seguradora;
+    private String problema;
+    private String local;
+    private String data;
+    private String hora;
+    private String modeloVeiculo;
+    private String anoFabricacao;
+    private String placa;
+    private String danosVeiculo;
+    private Boolean outrosEnvolvidos;
+    private Boolean feridos;
+    private Boolean possuiSeguro;
+    private String seguradora;
+    private String cobertura;
+    private String gravidade;
+    private String condicoesClimaticas;
+    private String condicoesVia;
+    private String testemunhas;
+    private String autoridadesAcionadas;
+    private String veiculoImobilizado;
+    private String categoriaProblema;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "oficina_id")
-    private Oficina oficina;
+    // Método para converter LinkedHashMap -> Sinistro
+    public static Sinistro fromMap(LinkedHashMap<String, Object> map) {
+        Sinistro s = new Sinistro();
+        s.setProblema((String) map.get("problema"));
+        s.setLocal((String) map.get("local"));
+        s.setData((String) map.get("data"));
+        s.setHora((String) map.get("hora"));
+        s.setModeloVeiculo((String) map.get("modelo_veiculo"));
+        s.setAnoFabricacao((String) map.get("ano_fabricacao"));
+        s.setPlaca((String) map.get("placa"));
+        s.setDanosVeiculo((String) map.get("danos_veiculo"));
+        s.setOutrosEnvolvidos((Boolean) map.get("outros_envolvidos"));
+        s.setFeridos((Boolean) map.get("feridos"));
+        s.setPossuiSeguro((Boolean) map.get("possui_seguro"));
+        s.setSeguradora((String) map.get("seguradora"));
+        s.setCobertura((String) map.get("cobertura"));
+        s.setGravidade((String) map.get("gravidade"));
+        s.setCondicoesClimaticas((String) map.get("condicoes_climaticas"));
+        s.setCondicoesVia((String) map.get("condicoes_via"));
+        s.setTestemunhas((String) map.get("testemunhas"));
+        s.setAutoridadesAcionadas((String) map.get("autoridades_acionadas"));
+        s.setVeiculoImobilizado((String) map.get("veiculo_imobilizado"));
+        s.setCategoriaProblema((String) map.get("categoria_problema"));
+        return s;
+    }
 
-    private String relato;
-
-    private String dados;
-
-    private StatusSinistro status;
+    @Override
+    public String toString() {
+        return "Sinistro{" +
+                "problema='" + problema + '\'' +
+                ", local='" + local + '\'' +
+                ", data='" + data + '\'' +
+                ", hora='" + hora + '\'' +
+                ", modeloVeiculo='" + modeloVeiculo + '\'' +
+                ", anoFabricacao='" + anoFabricacao + '\'' +
+                ", placa='" + placa + '\'' +
+                ", danosVeiculo='" + danosVeiculo + '\'' +
+                ", outrosEnvolvidos=" + outrosEnvolvidos +
+                ", feridos=" + feridos +
+                ", possuiSeguro=" + possuiSeguro +
+                ", seguradora='" + seguradora + '\'' +
+                ", cobertura='" + cobertura + '\'' +
+                ", gravidade='" + gravidade + '\'' +
+                ", condicoesClimaticas='" + condicoesClimaticas + '\'' +
+                ", condicoesVia='" + condicoesVia + '\'' +
+                ", testemunhas='" + testemunhas + '\'' +
+                ", autoridadesAcionadas='" + autoridadesAcionadas + '\'' +
+                ", veiculoImobilizado='" + veiculoImobilizado + '\'' +
+                ", categoriaProblema='" + categoriaProblema + '\'' +
+                '}';
+    }
 }

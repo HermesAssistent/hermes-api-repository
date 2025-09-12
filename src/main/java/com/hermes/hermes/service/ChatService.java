@@ -1,8 +1,10 @@
 package com.hermes.hermes.service;
 import com.hermes.hermes.domain.model.chat.ChatMessage;
 import com.hermes.hermes.domain.model.chat.ChatSession;
+import com.hermes.hermes.domain.model.sinistro.Sinistro;
 import com.hermes.hermes.repository.ChatMessageRepository;
 import com.hermes.hermes.repository.ChatSessionRepository;
+import com.hermes.hermes.repository.SinistroRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +25,22 @@ public class ChatService {
     private final ChatMessageRepository messageRepository;
     private final WebClient webClient;
     private final ChatMessageRepository chatMessageRepository;
+    private SinistroRepository sinistroRepository;
 
     @Autowired
     public ChatService(WebClient.Builder builder,
                        ChatSessionRepository sessionRepository,
                        ChatMessageRepository messageRepository,
-                       ChatMessageRepository chatMessageRepository) {
+                       ChatMessageRepository chatMessageRepository, SinistroRepository sinistroRepository) {
         this.webClient = builder.baseUrl("http://localhost:8000").build();
         this.sessionRepository = sessionRepository;
         this.messageRepository = messageRepository;
         this.chatMessageRepository = chatMessageRepository;
+        this.sinistroRepository = sinistroRepository;
     }
 
     public Map<String, Object> iniciarChat(Long userId) {
-        Optional<ChatSession> existing = sessionRepository.findByUserId(userId);
+        Optional<ChatSession> existing = sessionRepository.findByUserIdAndAtivoIsTrue(userId);
         if (existing.isPresent()) {
             return Map.of(
                     "status", "existente",
@@ -70,7 +74,7 @@ public class ChatService {
 
     public Map<String, Object> processarMensagem(Long userId, String texto) {
         // Recupera a sessão do banco
-        ChatSession session = sessionRepository.findByUserId(userId)
+        ChatSession session = sessionRepository.findByUserIdAndAtivoIsTrue(userId)
                 .orElseThrow(() -> new RuntimeException("Sessão não encontrada"));
 
         // Salva mensagem do usuário
@@ -107,6 +111,13 @@ public class ChatService {
         messageRepository.save(botMsg);
 
         assert respostaExterna != null;
+
+        if (Boolean.TRUE.equals(respostaExterna.get("conversa_finalizada"))) {
+          Sinistro sinistro = Sinistro.fromMap((LinkedHashMap<String, Object>) respostaExterna.get("resultado"));
+          sinistroRepository.save(sinistro);
+          this.limparSessao(userId);
+        }
+
         return Map.of(
                 "userMessage", userMsg.getContent(),
                 "botMessage", botMsg.getContent(),
@@ -120,8 +131,12 @@ public class ChatService {
     }
 
     public Map<String, Object> limparSessao(Long userId) {
-        sessionRepository.findByUserId(userId)
-                .ifPresent(sessionRepository::delete);
+       Optional<ChatSession> session = sessionRepository.findByUserIdAndAtivoIsTrue(userId);
+
+       if (session.isPresent()) {
+           session.get().setAtivo(false);
+           sessionRepository.save(session.get());
+       }
 
         // também limpa no serviço externo
         Map respostaExterna = webClient.delete()
