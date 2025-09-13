@@ -17,7 +17,12 @@ public class Cliente extends Usuario {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cli_cliente_seq")
     @SequenceGenerator(name = "cli_cliente_seq", sequenceName = "cli_cliente_seq", allocationSize = 1)
     private Long id;
-    @Column(nullable = false, unique = true, length = 11)
+    @Column(unique = true, length = 11)
     private String cpf;
     private String veiculo;
+
+    @Override
+    public String getRole() {
+        return "ROLE_CLIENTE";
+    }
 }
