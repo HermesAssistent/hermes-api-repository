@@ -20,7 +20,7 @@ public class ChatController {
 
 
     @GetMapping("/listar-mensagens/{sessionId}")
-    public List<ChatMessage> iniciar(@PathVariable("sessionId") String sessionId) {
+    public List<ChatMessage> listarMensagens(@PathVariable("sessionId") String sessionId) {
         try {
             return chatService.listarMensagensDaSessao(Long.valueOf(sessionId));
         } catch (Exception e) {
@@ -33,16 +33,6 @@ public class ChatController {
     public Map iniciar(@RequestParam Long userId) {
         try {
             return chatService.iniciarChat(userId);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao iniciar chat");
-        }
-    }
-
-    @PostMapping("/receber-relato")
-    public void receberRelato(@RequestParam Object userId) {
-        try {
-            System.out.println("relato" + userId);
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao iniciar chat");

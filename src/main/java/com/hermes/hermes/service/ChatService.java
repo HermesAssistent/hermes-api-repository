@@ -47,23 +47,21 @@ public class ChatService {
                     "sessionId", existing.get().getId()
             );
         }
-
-        // 1️⃣ Cria sessão local
+        // Cria sessão local
         ChatSession session = ChatSession.builder()
                 .userId(userId)
                 .messages(new ArrayList<>())
                 .build();
         sessionRepository.save(session);
 
-        // 2️⃣ Chama API Python para iniciar sessão externa
+        // Chama API Python para iniciar sessão externa
         Map respostaExterna = webClient.post()
                 .uri("/iniciar-chat")
                 .bodyValue(Map.of("user_id", userId.toString()))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
-
-        // 3️⃣ Retorna unindo info local + resposta externa
+        // Retorna unindo info local + resposta externa
         return Map.of(
                 "status", "nova",
                 "sessionId", session.getId(),
@@ -138,14 +136,7 @@ public class ChatService {
            sessionRepository.save(session.get());
        }
 
-        // também limpa no serviço externo
-        Map respostaExterna = webClient.delete()
-                .uri("/limpar-sessao/{userId}", String.valueOf(userId))
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
-
-        return Map.of("status", "sessão removida", "userId", userId, "externo", respostaExterna);
+        return Map.of("status", "sessão removida", "userId", userId);
     }
 
     public List<ChatMessage> listarMensagensDaSessao(Long sessionId) {

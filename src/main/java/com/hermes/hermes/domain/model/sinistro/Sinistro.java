@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 @Builder
 @Entity
 public class Sinistro extends Entidade {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sin_sinistro_seq")
     @SequenceGenerator(name = "sin_sinistro_seq", sequenceName = "sin_sinistro_seq", allocationSize = 1)
@@ -24,7 +23,6 @@ public class Sinistro extends Entidade {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
-
     private String problema;
     private String local;
     private String data;
@@ -46,7 +44,6 @@ public class Sinistro extends Entidade {
     private String veiculoImobilizado;
     private String categoriaProblema;
 
-    // Método para converter LinkedHashMap -> Sinistro
     public static Sinistro fromMap(LinkedHashMap<String, Object> map) {
         Sinistro s = new Sinistro();
         s.setProblema((String) map.get("problema"));

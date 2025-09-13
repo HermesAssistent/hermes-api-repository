@@ -7,12 +7,12 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "chat_sessions")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "chat_session")
 public class ChatSession extends Entidade {
 
     @Id
