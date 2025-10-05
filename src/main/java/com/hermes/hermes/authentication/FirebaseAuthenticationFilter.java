@@ -2,7 +2,7 @@ package com.hermes.hermes.authentication;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
-import com.hermes.hermes.domain.model.abstracts.Usuario;
+import com.hermes.hermes.domain.model.usuario.Usuario;
 import com.hermes.hermes.service.UsuarioService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

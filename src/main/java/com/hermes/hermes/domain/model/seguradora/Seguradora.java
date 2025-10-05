@@ -1,5 +1,5 @@
 package com.hermes.hermes.domain.model.seguradora;
-import com.hermes.hermes.domain.model.abstracts.Usuario;
+import com.hermes.hermes.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Seguradora extends Usuario {
+public class Seguradora {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seg_seguradora_seq")
@@ -19,8 +19,7 @@ public class Seguradora extends Usuario {
     private String cnpj;
     private String contato;
 
-    @Override
-    public String getRole() {
-        return "ROLE_SEGURADORA";
-    }
+    @OneToOne(optional = false)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
+    private Usuario usuario;
 }

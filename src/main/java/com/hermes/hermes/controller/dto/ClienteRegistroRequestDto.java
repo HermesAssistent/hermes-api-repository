@@ -11,6 +11,9 @@ public class ClienteRegistroRequestDto {
     private String senha;
     @NotEmpty(message = "Campo obrigatório")
     private String nome;
+    private String endereco;
+    private String telefone;
+    private String celular;
     @NotEmpty(message = "Campo obrigatório")
     private String cpf;
     @NotEmpty(message = "Campo obrigatório")
