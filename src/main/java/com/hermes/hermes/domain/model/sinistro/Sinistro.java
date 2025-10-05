@@ -1,6 +1,7 @@
 package com.hermes.hermes.domain.model.sinistro;
 
 import com.hermes.hermes.domain.model.abstracts.Entidade;
+import com.hermes.hermes.domain.model.chat.Foto;
 import com.hermes.hermes.domain.model.cliente.Cliente;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -43,6 +45,9 @@ public class Sinistro extends Entidade {
     private String autoridadesAcionadas;
     private String veiculoImobilizado;
     private String categoriaProblema;
+
+    @OneToMany(mappedBy = "sinistro", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Foto> fotos;
 
     public static Sinistro fromMap(LinkedHashMap<String, Object> map) {
         Sinistro s = new Sinistro();
