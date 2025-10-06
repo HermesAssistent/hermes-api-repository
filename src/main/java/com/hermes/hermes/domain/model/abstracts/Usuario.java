@@ -19,6 +19,8 @@ public abstract class Usuario extends Entidade implements Serializable {
     private String endereco;
     private String telefone;
     private String celular;
+    private Double latitude;
+    private Double longitude;
 
     public abstract String getRole();
 }
