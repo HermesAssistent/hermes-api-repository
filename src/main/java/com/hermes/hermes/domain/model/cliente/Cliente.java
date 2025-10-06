@@ -1,6 +1,6 @@
 package com.hermes.hermes.domain.model.cliente;
 
-import com.hermes.hermes.domain.model.abstracts.Usuario;
+import com.hermes.hermes.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Cliente extends Usuario {
+public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cli_cliente_seq")
     @SequenceGenerator(name = "cli_cliente_seq", sequenceName = "cli_cliente_seq", allocationSize = 1)
@@ -21,8 +21,7 @@ public class Cliente extends Usuario {
     private String cpf;
     private String veiculo;
 
-    @Override
-    public String getRole() {
-        return "ROLE_CLIENTE";
-    }
+    @OneToOne(optional = false)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
+    private Usuario usuario;
 }

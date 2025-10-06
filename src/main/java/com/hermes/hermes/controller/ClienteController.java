@@ -31,18 +31,10 @@ public class ClienteController {
         return ResponseEntity.ok(cliente);
     }
 
-    // A criação fica por conta do serviço de usuário
-    /*@PostMapping
-    public ResponseEntity<Cliente> criar(@RequestBody @Valid Cliente cliente) {
-        Cliente novoCliente = clienteService.create(cliente);
-        log.info("Cliente criado com sucesso: {}", novoCliente.getNome());
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoCliente);
-    }*/
-
     @PutMapping("/{id}")
     public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @RequestBody @Valid Cliente cliente) {
         Cliente clienteAtualizado = clienteService.update(id, cliente);
-        log.info("Cliente atualizado com sucesso: {}", clienteAtualizado.getNome());
+        log.info("Cliente atualizado com sucesso: {}", clienteAtualizado.getUsuario().getNome());
         return ResponseEntity.ok(clienteAtualizado);
     }
 

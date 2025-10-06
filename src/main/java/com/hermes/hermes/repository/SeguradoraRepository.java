@@ -7,6 +7,4 @@ import java.util.Optional;
 
 public interface SeguradoraRepository extends JpaRepository<Seguradora, Long> {
     Optional<Seguradora> findByCnpj(String cnpj);
-
-    Optional<Seguradora> findByUid(String uid);
 }

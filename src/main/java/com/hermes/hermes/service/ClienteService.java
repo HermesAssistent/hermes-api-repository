@@ -28,14 +28,13 @@ public class ClienteService {
     }
 
     public Cliente create(Cliente cliente) {
-        log.info("Criando novo cliente: {}", cliente.getNome());
+        log.info("Criando novo cliente: {}", cliente.getUsuario().getNome());
         return clienteRepository.save(cliente);
     }
 
     public Cliente update(Long id, Cliente clienteAtualizado) {
         Cliente cliente = findById(id);
-        cliente.setNome(clienteAtualizado.getNome());
-        cliente.setVeiculo(clienteAtualizado.getVeiculo());
+        cliente = clienteAtualizado;
         log.info("Atualizando cliente com ID: {}", id);
         return clienteRepository.saveAndFlush(cliente);
     }
@@ -43,7 +42,7 @@ public class ClienteService {
     public void delete(Long id) {
         Cliente cliente = findById(id);
         log.info("Deletando cliente com ID: {}", id);
-        cliente.setAtivo(false);
+        cliente.getUsuario().setAtivo(false);
         clienteRepository.save(cliente);
     }
 }

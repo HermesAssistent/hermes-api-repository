@@ -10,8 +10,8 @@ import java.util.Optional;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     Optional<Cliente> findByCpf(String cpf);
 
-    Optional<Cliente> findByUid(String uid);
-
-    @Query("SELECT c FROM Cliente c WHERE c.ativo = true")
+    @Query("SELECT c FROM Cliente c " +
+            "JOIN Usuario u ON c.usuario.id = u.id " +
+            "WHERE u.ativo = true")
     List<Cliente> findAllActives();
 }
