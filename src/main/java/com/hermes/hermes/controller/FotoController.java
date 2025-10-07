@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/fotos")
+@RequestMapping("/v1/fotos")
 @RequiredArgsConstructor
 public class FotoController {
 
