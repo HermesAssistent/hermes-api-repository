@@ -2,6 +2,9 @@ package com.hermes.hermes.service;
 import com.hermes.hermes.domain.model.chat.ChatMessage;
 import com.hermes.hermes.domain.model.chat.ChatSession;
 import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.exception.ExternalServiceException;
+import com.hermes.hermes.exception.InvalidResourceStateException;
+import com.hermes.hermes.exception.NotFoundException;
 import com.hermes.hermes.repository.ChatMessageRepository;
 import com.hermes.hermes.repository.ChatSessionRepository;
 import com.hermes.hermes.repository.SinistroRepository;
@@ -71,9 +74,16 @@ public class ChatService {
     }
 
     public Map<String, Object> processarMensagem(Long userId, String texto) {
+        if (userId == null) {
+            throw new InvalidResourceStateException("ID do usuário não fornecido");
+        }
+        if (texto == null || texto.trim().isEmpty()) {
+            throw new InvalidResourceStateException("Mensagem não fornecida ou vazia");
+        }
+
         // Recupera a sessão do banco
         ChatSession session = sessionRepository.findByUserIdAndAtivoIsTrue(userId)
-                .orElseThrow(() -> new RuntimeException("Sessão não encontrada"));
+                .orElseThrow(() -> new NotFoundException("Sessão não encontrada"));
 
         // Salva mensagem do usuário
         ChatMessage userMsg = ChatMessage.builder()
@@ -85,12 +95,17 @@ public class ChatService {
         messageRepository.save(userMsg);
 
         // Chama serviço externo (sempre enviar user_id como String)
-        Map respostaExterna = webClient.post()
-                .uri("/processar-mensagem")
-                .bodyValue(Map.of("user_id", userId.toString(), "texto", texto))
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+        Map respostaExterna;
+        try {
+            respostaExterna = webClient.post()
+                    .uri("/processar-mensagem")
+                    .bodyValue(Map.of("user_id", userId.toString(), "texto", texto))
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+        } catch (Exception e) {
+            throw new ExternalServiceException("ChatBot", e.getMessage());
+        }
 
         // Captura a resposta (se vier algo do bot)
         String respostaBot = respostaExterna != null && respostaExterna.containsKey("resposta")
@@ -129,17 +144,31 @@ public class ChatService {
     }
 
     public Map<String, Object> limparSessao(Long userId) {
+        if (userId == null) {
+            throw new InvalidResourceStateException("ID do usuário não fornecido");
+        }
        Optional<ChatSession> session = sessionRepository.findByUserIdAndAtivoIsTrue(userId);
 
        if (session.isPresent()) {
            session.get().setAtivo(false);
            sessionRepository.save(session.get());
+       } else {
+           log.error("Nenhuma sessão ativa encontrada para o usuário com ID: " + userId);
+           throw new NotFoundException("Nenhuma sessão ativa encontrada para o usuário");
        }
 
         return Map.of("status", "sessão removida", "userId", userId);
     }
 
     public List<ChatMessage> listarMensagensDaSessao(Long sessionId) {
-        return chatMessageRepository.findBySessionIdIsOrderByTimestampAsc(sessionId);
+        if (sessionId == null) {
+            throw new InvalidResourceStateException("ID da sessão não fornecido");
+        }
+        List<ChatMessage> messages = chatMessageRepository.findBySessionIdIsOrderByTimestampAsc(sessionId);
+        if (messages.isEmpty()) {
+            log.error("Nenhuma mensagem encontrada para a sessão com ID: " + sessionId);
+            throw new NotFoundException("Nenhuma mensagem encontrada para a sessão");
+        }
+        return messages;
     }
 }

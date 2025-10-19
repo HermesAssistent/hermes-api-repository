@@ -25,7 +25,7 @@ public class FotoController {
             @RequestParam("arquivo") MultipartFile arquivo,
             @RequestParam(value = "sessionId", required = false) Long sessionId,
             @RequestParam(value = "sinistroId", required = false) Long sinistroId
-    ) throws Exception {
+    ) {
         ChatSession session = null;
         Sinistro sinistro = null;
 

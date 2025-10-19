@@ -2,13 +2,12 @@ package com.hermes.hermes.service;
 
 import com.hermes.hermes.controller.dto.SinistroDto;
 import com.hermes.hermes.domain.model.sinistro.Sinistro;
-import com.hermes.hermes.repository.SinistroRepository;
+import com.hermes.hermes.exception.FileStorageException;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,37 +15,45 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RelatorioService {
-    private final SinistroRepository sinistroRepository;
+    private final SinistroService sinistroService;
 
-    public byte[] gerarPdf(Long sinistroId) throws IOException {
+    public byte[] gerarPdf(Long sinistroId) {
 
-        Optional<Sinistro> sinistroOptional = sinistroRepository.findById(sinistroId);
-
-        if (sinistroOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sinistro não foi encontrado");
-        }
+        Sinistro sinistro = sinistroService.buscarPorId(sinistroId);
 
         // Buscar o sinistro pelo ID
-        SinistroDto sinistro =  SinistroDto.fromEntity(sinistroOptional.get());
+        SinistroDto sinistroDto =  SinistroDto.fromEntity(sinistro);
 
         // Ler o template HTML
-        String html = lerTemplateHtml();
+        String html;
+        try {
+            html = lerTemplateHtml();
+        } catch (IOException e) {
+            log.error("Template HTML não encontrado: {}", e.getMessage());
+            throw new FileStorageException("Erro ao ler template do relatório: " + e.getMessage());
+        }
 
         // Preencher o HTML com os dados do sinistro
-        html = preencherTemplate(html, sinistro);
+        html = preencherTemplate(html, sinistroDto);
 
         // Gerar PDF em memória
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         PdfRendererBuilder builder = new PdfRendererBuilder();
-        builder.useFastMode();
-        builder.withHtmlContent(html, null);
-        builder.toStream(os);
-        builder.run();
+
+        try {
+            builder.useFastMode();
+            builder.withHtmlContent(html, null);
+            builder.toStream(os);
+            builder.run();
+        } catch (IOException e) {
+            log.error("Erro ao gerar relatório PDF: {}", e.getMessage());
+            throw new FileStorageException("Erro ao gerar relatório PDF: " + e.getMessage());
+        }
 
         return os.toByteArray();
     }

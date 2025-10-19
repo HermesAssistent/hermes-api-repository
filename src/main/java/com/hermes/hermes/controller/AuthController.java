@@ -40,13 +40,9 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
-        try {
-            String idToken = authHeader.replace("Bearer ", "");
-            FirebaseToken decodedToken = firebaseAuthService.verifyIdToken(idToken);
-            firebaseAuthService.revokeRefreshTokens(decodedToken.getUid());
-            return ResponseEntity.ok("Logout realizado com sucesso");
-        } catch (FirebaseAuthException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
-        }
+        String idToken = authHeader.replace("Bearer ", "");
+        FirebaseToken decodedToken = firebaseAuthService.verifyIdToken(idToken);
+        firebaseAuthService.revokeRefreshTokens(decodedToken.getUid());
+        return ResponseEntity.ok("Logout realizado com sucesso");
     }
 }

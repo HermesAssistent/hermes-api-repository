@@ -21,22 +21,12 @@ public class ChatController {
 
     @GetMapping("/listar-mensagens/{sessionId}")
     public List<ChatMessage> listarMensagens(@PathVariable("sessionId") String sessionId) {
-        try {
-            return chatService.listarMensagensDaSessao(Long.valueOf(sessionId));
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao listar Mensagens de Sessao");
-        }
+        return chatService.listarMensagensDaSessao(Long.valueOf(sessionId));
     }
 
     @PostMapping("/iniciar")
     public Map iniciar(@RequestParam Long userId) {
-        try {
-            return chatService.iniciarChat(userId);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao iniciar chat");
-        }
+        return chatService.iniciarChat(userId);
     }
 
     @PostMapping("/processar")
@@ -44,33 +34,17 @@ public class ChatController {
             @RequestParam Long userId,
             @RequestParam String texto
     ) {
-        try {
-            return chatService.processarMensagem(userId, texto);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao processar chat");
-        }
+        return chatService.processarMensagem(userId, texto);
     }
 
     @GetMapping("/sessoes")
     public Map listarSessoes() {
-        try {
-            return chatService.listarSessoes();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao listar chat");
-        }
+        return chatService.listarSessoes();
     }
 
     @DeleteMapping("/limpar/{userId}")
     public Map limpar(@PathVariable Long userId) {
-        try {
-            return chatService.limparSessao(userId);
-        }  catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao limpar chat");
-        }
-
+        return chatService.limparSessao(userId);
     }
 
 

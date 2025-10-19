@@ -14,4 +14,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
             "JOIN Usuario u ON c.usuario.id = u.id " +
             "WHERE u.ativo = true")
     List<Cliente> findAllActives();
+
+    boolean existsByCpf(String cpf);
 }

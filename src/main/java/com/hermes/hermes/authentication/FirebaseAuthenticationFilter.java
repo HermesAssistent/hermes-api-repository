@@ -1,13 +1,16 @@
 package com.hermes.hermes.authentication;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.hermes.hermes.domain.model.usuario.Usuario;
+import com.hermes.hermes.exception.AuthenticationException;
 import com.hermes.hermes.service.UsuarioService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Component
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
     private final UsuarioService usuarioService;
@@ -41,6 +45,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
             String uid = decodedToken.getUid();
 
+            log.info("Token Firebase validado para UID: {}", uid);
             Usuario usuario = usuarioService.findByUid(uid);
 
             UsernamePasswordAuthenticationToken authentication =
@@ -51,13 +56,12 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("Autenticação configurada para usuário: {}", usuario.getEmail());
 
-        } catch (Exception e) {
-            System.err.println("Erro ao validar token Firebase: " + e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+            filterChain.doFilter(request, response);
+        } catch (FirebaseAuthException e) {
+            log.error("Erro ao validar token Firebase: {}", e.getMessage());
+            throw new AuthenticationException("Token Firebase inválido: " + e.getMessage());
         }
-
-        filterChain.doFilter(request, response);
     }
 }
