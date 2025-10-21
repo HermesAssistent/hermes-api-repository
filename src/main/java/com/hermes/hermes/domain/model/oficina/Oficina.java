@@ -15,11 +15,14 @@ public class Oficina extends Entidade {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seg_oficina_seq")
     @SequenceGenerator(name = "seg_oficina_seq", sequenceName = "seg_oficina_seq", allocationSize = 1)
+
     private Long id;
-
     private String nome;
-
     private String telefone;
-
     private String endereco;
+    private Double latitude;
+    private Double longitude;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private java.util.List<String> especialidades;
 }
