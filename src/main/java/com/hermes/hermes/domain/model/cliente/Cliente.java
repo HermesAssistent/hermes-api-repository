@@ -1,5 +1,6 @@
 package com.hermes.hermes.domain.model.cliente;
 
+import com.hermes.hermes.domain.model.abstracts.Entidade;
 import com.hermes.hermes.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Cliente {
+public class Cliente extends Entidade {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cli_cliente_seq")
     @SequenceGenerator(name = "cli_cliente_seq", sequenceName = "cli_cliente_seq", allocationSize = 1)

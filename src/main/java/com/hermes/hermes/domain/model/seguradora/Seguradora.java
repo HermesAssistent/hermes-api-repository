@@ -1,4 +1,5 @@
 package com.hermes.hermes.domain.model.seguradora;
+import com.hermes.hermes.domain.model.abstracts.Entidade;
 import com.hermes.hermes.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,13 +10,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Seguradora {
+public class Seguradora extends Entidade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seg_seguradora_seq")
     @SequenceGenerator(name = "seg_seguradora_seq", sequenceName = "seg_seguradora_seq", allocationSize = 1)
     private Long id;
-    @Column(unique = true, length = 14)
+    @Column(unique = true, length = 20)
     private String cnpj;
     private String contato;
 
