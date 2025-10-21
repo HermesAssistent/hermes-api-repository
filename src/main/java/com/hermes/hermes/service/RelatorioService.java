@@ -64,7 +64,6 @@ public class RelatorioService {
         try (InputStream inputStream = resource.getInputStream()) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
-
     }
 
     private String preencherTemplate(String html, SinistroDto sinistro) {

@@ -45,6 +45,8 @@ public class Sinistro extends Entidade {
     private String autoridadesAcionadas;
     private String veiculoImobilizado;
     private String categoriaProblema;
+    private Double latitude;
+    private Double longitude;
 
     @OneToMany(mappedBy = "sinistro", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Foto> fotos;

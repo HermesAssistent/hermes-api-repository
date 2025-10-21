@@ -24,4 +24,8 @@ public class Cliente {
     @OneToOne(optional = false)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
     private Usuario usuario;
+
+    private Double latitude;
+
+    private Double longitude;
 }
