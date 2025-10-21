@@ -16,6 +16,5 @@ public class ClienteRegistroRequestDto {
     private String celular;
     @NotEmpty(message = "Campo obrigatório")
     private String cpf;
-    @NotEmpty(message = "Campo obrigatório")
     private String veiculo;
 }

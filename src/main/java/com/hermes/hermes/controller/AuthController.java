@@ -6,6 +6,7 @@ import com.hermes.hermes.controller.dto.ClienteRegistroRequestDto;
 import com.hermes.hermes.controller.dto.ClienteResponseDto;
 import com.hermes.hermes.domain.model.usuario.Usuario;
 import com.hermes.hermes.domain.model.cliente.Cliente;
+import com.hermes.hermes.service.ChatService;
 import com.hermes.hermes.service.ClienteRegistroService;
 import com.hermes.hermes.service.UsuarioService;
 import com.hermes.hermes.service.auth.FirebaseAuthService;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/v1/auth")
@@ -22,6 +25,7 @@ public class AuthController {
     private final ClienteRegistroService clienteRegistroService;
     private final UsuarioService usuarioService;
     private final FirebaseAuthService firebaseAuthService;
+    private final ChatService chatService;
 
     @PostMapping("/registrar/cliente")
     public ResponseEntity<ClienteResponseDto> registrarCliente(@RequestBody ClienteRegistroRequestDto req) throws Exception {
@@ -35,12 +39,16 @@ public class AuthController {
         String token = authHeader.replace("Bearer ", "");
         FirebaseToken decoded = firebaseAuthService.verifyIdToken(token);
         Usuario u = usuarioService.findByUid(decoded.getUid());
-        return ResponseEntity.ok(u);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("user", u);
+        map.put("token", token);
+        return ResponseEntity.ok(map);
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
+    @PostMapping("/logout/{id}")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader, @PathVariable String id) throws Exception {
         String idToken = authHeader.replace("Bearer ", "");
+        chatService.limparSessao(Long.parseLong(id));
         FirebaseToken decodedToken = firebaseAuthService.verifyIdToken(idToken);
         firebaseAuthService.revokeRefreshTokens(decodedToken.getUid());
         return ResponseEntity.ok("Logout realizado com sucesso");

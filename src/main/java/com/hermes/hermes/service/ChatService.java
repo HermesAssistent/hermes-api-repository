@@ -164,11 +164,7 @@ public class ChatService {
         if (sessionId == null) {
             throw new InvalidResourceStateException("ID da sessão não fornecido");
         }
-        List<ChatMessage> messages = chatMessageRepository.findBySessionIdIsOrderByTimestampAsc(sessionId);
-        if (messages.isEmpty()) {
-            log.error("Nenhuma mensagem encontrada para a sessão com ID: " + sessionId);
-            throw new NotFoundException("Nenhuma mensagem encontrada para a sessão");
-        }
-        return messages;
+        return chatMessageRepository.findBySessionIdIsOrderByTimestampAsc(sessionId);
+
     }
 }
