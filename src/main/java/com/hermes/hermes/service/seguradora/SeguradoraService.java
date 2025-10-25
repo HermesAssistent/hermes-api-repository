@@ -1,4 +1,4 @@
-package com.hermes.hermes.service;
+package com.hermes.hermes.service.seguradora;
 import com.hermes.hermes.domain.model.seguradora.Seguradora;
 import com.hermes.hermes.exception.DuplicateResourceException;
 import com.hermes.hermes.exception.InvalidResourceStateException;
@@ -29,6 +29,12 @@ public class SeguradoraService {
         log.info("Buscando cliente com ID: {}", id);
         return seguradoraRepository.findByIdAndAtivoIsTrue(id)
                 .orElseThrow(() -> new NotFoundException("Seguradora não encontrada com ID: " + id));
+    }
+
+    public Seguradora findByUsuarioId(Long usuarioId) {
+        log.info("Buscando seguradora com usuario ID: {}", usuarioId);
+        return seguradoraRepository.findByAtivoIsTrueAndUsuario_Id(usuarioId)
+                .orElseThrow(() -> new NotFoundException("Seguradora não encontrada com usuário ID: " + usuarioId));
     }
 
     public Seguradora create(Seguradora seguradora) {

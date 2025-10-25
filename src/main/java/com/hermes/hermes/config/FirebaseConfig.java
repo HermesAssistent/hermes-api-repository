@@ -1,31 +1,36 @@
-package com.hermes.hermes.config;
+    package com.hermes.hermes.config;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.beans.factory.annotation.Value;
-import javax.annotation.PostConstruct;
-import java.io.FileInputStream;
-import java.io.IOException;
+    import com.google.auth.oauth2.GoogleCredentials;
+    import com.google.firebase.FirebaseApp;
+    import com.google.firebase.FirebaseOptions;
+    import com.hermes.hermes.exception.AuthenticationException;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.beans.factory.annotation.Value;
+    import org.springframework.http.HttpStatus;
 
-@Configuration
-public class FirebaseConfig {
+    import javax.annotation.PostConstruct;
+    import java.io.FileInputStream;
+    import java.io.IOException;
 
-    @Value("${firebase.service-account.path}")
-    private String serviceAccountPath;
+    @Configuration
+    public class FirebaseConfig {
 
-    @PostConstruct
-    public void initializeFirebase() throws IOException {
-        try (FileInputStream serviceAccount = new FileInputStream(serviceAccountPath)) {
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
+        @Value("${firebase.service-account.path}")
+        private String serviceAccountPath;
 
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
-                System.out.println("Firebase inicializado com sucesso!");
+        @PostConstruct
+        public void initializeFirebase() throws IOException {
+            try (FileInputStream serviceAccount = new FileInputStream(serviceAccountPath)) {
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .build();
+
+                if (FirebaseApp.getApps().isEmpty()) {
+                    FirebaseApp.initializeApp(options);
+                    System.out.println("Firebase inicializado com sucesso!");
+                }
+            } catch (Exception ex) {
+                throw new AuthenticationException(HttpStatus.UNAUTHORIZED,"Sessão expirada!");
             }
         }
     }
-}

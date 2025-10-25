@@ -53,28 +53,70 @@ public class Sinistro extends Entidade {
 
     public static Sinistro fromMap(LinkedHashMap<String, Object> map) {
         Sinistro s = new Sinistro();
-        s.setProblema((String) map.get("problema"));
-        s.setLocal((String) map.get("local"));
-        s.setData((String) map.get("data"));
-        s.setHora((String) map.get("hora"));
-        s.setModeloVeiculo((String) map.get("modelo_veiculo"));
-        s.setAnoFabricacao((String) map.get("ano_fabricacao"));
-        s.setPlaca((String) map.get("placa"));
-        s.setDanosVeiculo((String) map.get("danos_veiculo"));
-        s.setOutrosEnvolvidos((Boolean) map.get("outros_envolvidos"));
-        s.setFeridos((Boolean) map.get("feridos"));
-        s.setPossuiSeguro((Boolean) map.get("possui_seguro"));
-        s.setSeguradora((String) map.get("seguradora"));
-        s.setCobertura((String) map.get("cobertura"));
-        s.setGravidade((String) map.get("gravidade"));
-        s.setCondicoesClimaticas((String) map.get("condicoes_climaticas"));
-        s.setCondicoesVia((String) map.get("condicoes_via"));
-        s.setTestemunhas((String) map.get("testemunhas"));
-        s.setAutoridadesAcionadas((String) map.get("autoridades_acionadas"));
-        s.setVeiculoImobilizado((String) map.get("veiculo_imobilizado"));
-        s.setCategoriaProblema((String) map.get("categoria_problema"));
+
+        if (map.containsKey("problema") && map.get("problema") != null)
+            s.setProblema(map.get("problema").toString());
+
+        if (map.containsKey("local") && map.get("local") != null)
+            s.setLocal(map.get("local").toString());
+
+        if (map.containsKey("data") && map.get("data") != null)
+            s.setData(map.get("data").toString());
+
+        if (map.containsKey("hora") && map.get("hora") != null)
+            s.setHora(map.get("hora").toString());
+
+        if (map.containsKey("modelo_veiculo") && map.get("modelo_veiculo") != null)
+            s.setModeloVeiculo(map.get("modelo_veiculo").toString());
+
+        if (map.containsKey("ano_fabricacao") && map.get("ano_fabricacao") != null)
+            s.setAnoFabricacao(map.get("ano_fabricacao").toString());
+
+        if (map.containsKey("placa") && map.get("placa") != null)
+            s.setPlaca(map.get("placa").toString());
+
+        if (map.containsKey("danos_veiculo") && map.get("danos_veiculo") != null)
+            s.setDanosVeiculo(map.get("danos_veiculo").toString());
+
+        if (map.containsKey("outros_envolvidos") && map.get("outros_envolvidos") != null)
+            s.setOutrosEnvolvidos(Boolean.parseBoolean(map.get("outros_envolvidos").toString()));
+
+        if (map.containsKey("feridos") && map.get("feridos") != null)
+            s.setFeridos(Boolean.parseBoolean(map.get("feridos").toString()));
+
+        if (map.containsKey("possui_seguro") && map.get("possui_seguro") != null)
+            s.setPossuiSeguro(Boolean.parseBoolean(map.get("possui_seguro").toString()));
+
+        if (map.containsKey("seguradora") && map.get("seguradora") != null)
+            s.setSeguradora(map.get("seguradora").toString());
+
+        if (map.containsKey("cobertura") && map.get("cobertura") != null)
+            s.setCobertura(map.get("cobertura").toString());
+
+        if (map.containsKey("gravidade") && map.get("gravidade") != null)
+            s.setGravidade(map.get("gravidade").toString());
+
+        if (map.containsKey("condicoes_climaticas") && map.get("condicoes_climaticas") != null)
+            s.setCondicoesClimaticas(map.get("condicoes_climaticas").toString());
+
+        if (map.containsKey("condicoes_via") && map.get("condicoes_via") != null)
+            s.setCondicoesVia(map.get("condicoes_via").toString());
+
+        if (map.containsKey("testemunhas") && map.get("testemunhas") != null)
+            s.setTestemunhas(map.get("testemunhas").toString());
+
+        if (map.containsKey("autoridades_acionadas") && map.get("autoridades_acionadas") != null)
+            s.setAutoridadesAcionadas(map.get("autoridades_acionadas").toString());
+
+        if (map.containsKey("veiculo_imobilizado") && map.get("veiculo_imobilizado") != null)
+            s.setVeiculoImobilizado(map.get("veiculo_imobilizado").toString());
+
+        if (map.containsKey("categoria_problema") && map.get("categoria_problema") != null)
+            s.setCategoriaProblema(map.get("categoria_problema").toString());
+
         return s;
     }
+
 
     @Override
     public String toString() {

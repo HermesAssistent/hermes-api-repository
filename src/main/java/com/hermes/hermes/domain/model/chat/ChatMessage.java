@@ -21,6 +21,7 @@ public class ChatMessage {
 
     private String sender;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private LocalDateTime timestamp;

@@ -10,7 +10,7 @@ public class SeguradoraRegistroRequestDto {
     @NotEmpty(message = "Campo obrigatório")
     private String senha;
     @NotEmpty(message = "Campo obrigatório")
-    private String nome;
+    private String razaoSocial;
     private String endereco;
     private String telefone;
     private String celular;

@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -67,7 +68,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (FirebaseAuthException e) {
             log.error("Erro ao validar token Firebase: {}", e.getMessage());
-            throw new AuthenticationException("Token Firebase inválido: " + e.getMessage());
+            throw new AuthenticationException(HttpStatus.UNAUTHORIZED,"Sessão expirada!");
         }
     }
 }
