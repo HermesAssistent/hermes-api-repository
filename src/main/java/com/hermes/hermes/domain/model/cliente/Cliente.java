@@ -1,6 +1,7 @@
 package com.hermes.hermes.domain.model.cliente;
 
 import com.hermes.hermes.domain.model.abstracts.Entidade;
+import com.hermes.hermes.domain.model.seguradora.Seguradora;
 import com.hermes.hermes.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,13 +19,16 @@ public class Cliente extends Entidade {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cli_cliente_seq")
     @SequenceGenerator(name = "cli_cliente_seq", sequenceName = "cli_cliente_seq", allocationSize = 1)
     private Long id;
-    @Column(unique = true, length = 11)
+    @Column(unique = true, length = 15)
     private String cpf;
     private String veiculo;
 
     @OneToOne(optional = false)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
     private Usuario usuario;
+
+    @JoinColumn(name = "seguradora_id", referencedColumnName = "id", unique = true)
+    private Seguradora seguradora;
 
     private Double latitude;
 

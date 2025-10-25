@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,9 +23,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final UsuarioService usuarioService;
+    private final FirebaseAuthenticationFilter firebaseFilter;
 
-    public SecurityConfig(FirebaseAuthenticationFilter firebaseFilter, FirebaseConfig firebaseConfig, UsuarioService usuarioService) {
+    public SecurityConfig(UsuarioService usuarioService, FirebaseAuthenticationFilter firebaseFilter) {
         this.usuarioService = usuarioService;
+        this.firebaseFilter = firebaseFilter;
     }
 
     @Bean
@@ -39,7 +42,19 @@ public class SecurityConfig {
                         .requestMatchers("/v1/seguradora/**").hasRole("SEGURADORA")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new FirebaseAuthenticationFilter(usuarioService), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"" + authException.getMessage() + "\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpStatus.FORBIDDEN.value());
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Acesso negado\"}");
+                        })
+                )
+                .addFilterBefore(firebaseFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
