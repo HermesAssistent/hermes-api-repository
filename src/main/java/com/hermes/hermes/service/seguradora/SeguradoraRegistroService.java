@@ -1,4 +1,4 @@
-package com.hermes.hermes.service;
+package com.hermes.hermes.service.seguradora;
 
 import com.hermes.hermes.controller.dto.SeguradoraRegistroRequestDto;
 import com.hermes.hermes.domain.enums.Role;
@@ -7,6 +7,7 @@ import com.hermes.hermes.domain.model.usuario.Usuario;
 import com.hermes.hermes.exception.DuplicateResourceException;
 import com.hermes.hermes.exception.InvalidResourceStateException;
 import com.hermes.hermes.repository.UsuarioRepository;
+import com.hermes.hermes.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class SeguradoraRegistroService {
         Usuario usuario = usuarioService.criarUsuario(
                 req.getEmail(),
                 req.getSenha(),
-                req.getNome(),
+                req.getRazaoSocial(),
                 req.getEndereco(),
                 req.getTelefone(),
                 req.getCelular(),
@@ -35,6 +36,8 @@ public class SeguradoraRegistroService {
         );
 
         Seguradora seguradora = new Seguradora();
+        seguradora.setRazaoSocial(req.getRazaoSocial());
+        seguradora.setContato(req.getCelular());
         seguradora.setCnpj(req.getCnpj());
         seguradora.setUsuario(usuario);
 
@@ -42,8 +45,8 @@ public class SeguradoraRegistroService {
     }
 
     private void validateRequest(SeguradoraRegistroRequestDto req) {
-        if (req.getEmail() == null || req.getSenha() == null || req.getNome() == null || req.getCnpj() == null) {
-            throw new InvalidResourceStateException("Campos obrigatórios (e-mail, senha, nome, CNPJ) não fornecidos");
+        if (req.getEmail() == null || req.getSenha() == null || req.getRazaoSocial() == null || req.getCnpj() == null) {
+            throw new InvalidResourceStateException("Campos obrigatórios (e-mail, senha, razão social, CNPJ) não fornecidos");
         }
     }
 }

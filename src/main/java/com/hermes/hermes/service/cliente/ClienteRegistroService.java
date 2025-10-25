@@ -1,4 +1,4 @@
-package com.hermes.hermes.service;
+package com.hermes.hermes.service.cliente;
 
 import com.hermes.hermes.controller.dto.ClienteRegistroRequestDto;
 import com.hermes.hermes.domain.enums.Role;
@@ -7,6 +7,7 @@ import com.hermes.hermes.domain.model.usuario.Usuario;
 import com.hermes.hermes.exception.DuplicateResourceException;
 import com.hermes.hermes.exception.InvalidResourceStateException;
 import com.hermes.hermes.repository.UsuarioRepository;
+import com.hermes.hermes.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

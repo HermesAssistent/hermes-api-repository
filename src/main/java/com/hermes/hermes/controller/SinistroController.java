@@ -25,7 +25,7 @@ public class SinistroController {
     }
 
     @GetMapping("/{id}")
-    public List<SinistroDto> listarSinistrosDoUsuario(@PathVariable String id) {
+    public List<SinistroDto> listarSinistrosDoCliente(@PathVariable String id) {
         return sinistroService.findByClienteId(id).stream().map(SinistroDto::fromEntity).toList();
     }
 

@@ -9,4 +9,7 @@ public interface SeguradoraRepository extends JpaRepository<Seguradora, Long> {
     Optional<Seguradora> findByCnpj(String cnpj);
 
     Optional<Seguradora> findByIdAndAtivoIsTrue(Long id);
+
+    Optional<Seguradora> findByAtivoIsTrueAndUsuario_Id(Long id);
+
 }

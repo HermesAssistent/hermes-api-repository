@@ -27,7 +27,8 @@ public class Cliente extends Entidade {
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
     private Usuario usuario;
 
-    @JoinColumn(name = "seguradora_id", referencedColumnName = "id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seguradora_id")
     private Seguradora seguradora;
 
     private Double latitude;

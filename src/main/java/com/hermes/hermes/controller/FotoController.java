@@ -3,7 +3,7 @@ package com.hermes.hermes.controller;
 import com.hermes.hermes.domain.model.chat.ChatSession;
 import com.hermes.hermes.domain.model.chat.Foto;
 import com.hermes.hermes.domain.model.sinistro.Sinistro;
-import com.hermes.hermes.service.ChatSessionService;
+import com.hermes.hermes.service.chat.ChatSessionService;
 import com.hermes.hermes.service.FotoService;
 import com.hermes.hermes.service.SinistroService;
 import lombok.RequiredArgsConstructor;

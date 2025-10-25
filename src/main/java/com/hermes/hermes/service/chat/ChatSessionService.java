@@ -1,4 +1,4 @@
-package com.hermes.hermes.service;
+package com.hermes.hermes.service.chat;
 
 import com.hermes.hermes.domain.model.chat.ChatSession;
 import com.hermes.hermes.exception.NotFoundException;
