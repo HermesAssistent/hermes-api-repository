@@ -18,7 +18,7 @@ public class Cliente extends Entidade {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cli_cliente_seq")
     @SequenceGenerator(name = "cli_cliente_seq", sequenceName = "cli_cliente_seq", allocationSize = 1)
     private Long id;
-    @Column(unique = true, length = 11)
+    @Column(unique = true, length = 14)
     private String cpf;
     private String veiculo;
 
