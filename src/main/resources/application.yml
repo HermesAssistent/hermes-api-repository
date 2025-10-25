@@ -13,7 +13,7 @@ spring:
 
 firebase:
   service-account:
-    path: ${FIREBASE_SERVICE_ACCOUNT}
+    path: C:\Users\educh\OneDrive\Área de Trabalho\hermes-api-repository\src\main\resources\API-firebase.json
 
 server:
   port: 8090

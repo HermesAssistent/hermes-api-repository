@@ -3,6 +3,7 @@ package com.hermes.hermes.domain.model.sinistro;
 import com.hermes.hermes.domain.model.abstracts.Entidade;
 import com.hermes.hermes.domain.model.chat.Foto;
 import com.hermes.hermes.domain.model.cliente.Cliente;
+import com.hermes.hermes.domain.model.localizacao.Localizacao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +27,6 @@ public class Sinistro extends Entidade {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
     private String problema;
-    private String local;
     private String data;
     private String hora;
     private String modeloVeiculo;
@@ -45,16 +45,15 @@ public class Sinistro extends Entidade {
     private String autoridadesAcionadas;
     private String veiculoImobilizado;
     private String categoriaProblema;
-    private Double latitude;
-    private Double longitude;
 
     @OneToMany(mappedBy = "sinistro", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Foto> fotos;
+    @Embedded
+    private Localizacao localizacao;
 
     public static Sinistro fromMap(LinkedHashMap<String, Object> map) {
         Sinistro s = new Sinistro();
         s.setProblema((String) map.get("problema"));
-        s.setLocal((String) map.get("local"));
         s.setData((String) map.get("data"));
         s.setHora((String) map.get("hora"));
         s.setModeloVeiculo((String) map.get("modelo_veiculo"));
@@ -73,6 +72,33 @@ public class Sinistro extends Entidade {
         s.setAutoridadesAcionadas((String) map.get("autoridades_acionadas"));
         s.setVeiculoImobilizado((String) map.get("veiculo_imobilizado"));
         s.setCategoriaProblema((String) map.get("categoria_problema"));
+
+        // Priorizar CEP e endereço como principais meios de localização
+        String endereco = (String) map.get("endereco");
+        String cep = (String) map.get("cep");
+
+        // Coordenadas são opcionais e usadas apenas para cálculos internos
+        Double latitude = null;
+        Double longitude = null;
+
+        try {
+            if (map.get("latitude") != null) {
+                latitude = map.get("latitude") instanceof String ? Double.valueOf((String) map.get("latitude")) : (Double) map.get("latitude");
+            }
+
+            if (map.get("longitude") != null) {
+                longitude = map.get("longitude") instanceof String ? Double.valueOf((String) map.get("longitude")) : (Double) map.get("longitude");
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("Erro ao converter latitude ou longitude para Double: " + e.getMessage());
+        }
+
+        // Garantir que pelo menos o CEP ou o endereço estejam presentes
+        if (cep == null || endereco == null) {
+            throw new IllegalArgumentException("CEP e endereço são obrigatórios para criar um Sinistro.");
+        }
+
+        s.setLocalizacao(new Localizacao(endereco, latitude, longitude, cep));
         return s;
     }
 
@@ -80,7 +106,6 @@ public class Sinistro extends Entidade {
     public String toString() {
         return "Sinistro{" +
                 "problema='" + problema + '\'' +
-                ", local='" + local + '\'' +
                 ", data='" + data + '\'' +
                 ", hora='" + hora + '\'' +
                 ", modeloVeiculo='" + modeloVeiculo + '\'' +

@@ -41,7 +41,7 @@ public class SinistroDto {
         return SinistroDto.builder()
                 .id(entity.getId())
                 .problema(entity.getProblema())
-                .local(entity.getLocal())
+                .local(entity.getLocalizacao() != null ? entity.getLocalizacao().getEndereco() : null)
                 .data(entity.getData())
                 .hora(entity.getHora())
                 .modeloVeiculo(entity.getModeloVeiculo())

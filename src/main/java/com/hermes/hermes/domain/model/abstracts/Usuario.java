@@ -1,6 +1,8 @@
 package com.hermes.hermes.domain.model.abstracts;
 
+import com.hermes.hermes.domain.model.localizacao.Localizacao;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 
@@ -16,11 +18,10 @@ public abstract class Usuario extends Entidade implements Serializable {
     private String login;
     @Column(nullable = false, unique = true)
     private String email;
-    private String endereco;
     private String telefone;
     private String celular;
-    private Double latitude;
-    private Double longitude;
+    @Embedded
+    private Localizacao localizacao;
 
     public abstract String getRole();
 }

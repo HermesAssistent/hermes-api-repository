@@ -1,6 +1,7 @@
 package com.hermes.hermes.domain.model.oficina;
 
 import com.hermes.hermes.domain.model.abstracts.Entidade;
+import com.hermes.hermes.domain.model.localizacao.Localizacao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,9 +20,9 @@ public class Oficina extends Entidade {
     private Long id;
     private String nome;
     private String telefone;
-    private String endereco;
-    private Double latitude;
-    private Double longitude;
+
+    @Embedded
+    private Localizacao localizacao;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private java.util.List<String> especialidades;
