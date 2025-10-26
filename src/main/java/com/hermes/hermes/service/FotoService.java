@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -49,6 +50,14 @@ public class FotoService {
         } catch (IOException e) {
             log.error("Erro ao salvar arquivo: {}", e.getMessage());
             throw new FileStorageException("Erro ao salvar arquivo: " + e.getMessage());
+        }
+    }
+
+    public void relacionarSinistro(ChatSession session, Sinistro sinistro) {
+        List<Foto> fotos = fotoRepository.findAllByChatSession(session);
+        for (Foto foto : fotos) {
+            foto.setSinistro(sinistro);
+            fotoRepository.save(foto);
         }
     }
 }

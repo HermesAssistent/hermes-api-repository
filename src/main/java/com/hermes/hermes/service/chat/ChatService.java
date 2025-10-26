@@ -9,6 +9,7 @@ import com.hermes.hermes.exception.NotFoundException;
 import com.hermes.hermes.repository.ChatMessageRepository;
 import com.hermes.hermes.repository.ChatSessionRepository;
 import com.hermes.hermes.repository.SinistroRepository;
+import com.hermes.hermes.service.FotoService;
 import com.hermes.hermes.service.cliente.ClienteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,18 +32,20 @@ public class ChatService {
     private final WebClient webClient;
     private final ChatMessageRepository chatMessageRepository;
     private SinistroRepository sinistroRepository;
+    private final FotoService fotoService;
     private final ClienteService clienteService;
 
     @Autowired
     public ChatService(WebClient.Builder builder,
                        ChatSessionRepository sessionRepository,
                        ChatMessageRepository messageRepository,
-                       ChatMessageRepository chatMessageRepository, SinistroRepository sinistroRepository,  ClienteService clienteService) {
+                       ChatMessageRepository chatMessageRepository, SinistroRepository sinistroRepository, FotoService fotoService, ClienteService clienteService) {
         this.webClient = builder.baseUrl("http://localhost:8000").build();
         this.sessionRepository = sessionRepository;
         this.messageRepository = messageRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.sinistroRepository = sinistroRepository;
+        this.fotoService = fotoService;
         this.clienteService = clienteService;
     }
 
@@ -134,6 +137,7 @@ public class ChatService {
           Cliente cliente = clienteService.findByUsuarioId(userId);
           sinistro.setCliente(cliente);
           sinistroRepository.save(sinistro);
+          fotoService.relacionarSinistro(session, sinistro);
           this.limparSessao(userId);
         }
 

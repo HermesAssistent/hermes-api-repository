@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,11 +35,23 @@ public class SinistroDto {
     private String veiculoImobilizado;
     private String categoriaProblema;
 
+    private List<FotoDto> fotos;
+
     public static SinistroDto fromEntity(Sinistro entity) {
         if (entity == null) {
             return null;
         }
-
+        List<FotoDto> fotoDtos = entity.getFotos().stream()
+                .map(foto -> {
+                    FotoDto fotoDto = new FotoDto();
+                    fotoDto.setId(foto.getId());
+                    fotoDto.setNomeArquivo(foto.getNomeArquivo());
+                    fotoDto.setCaminhoArquivo(foto.getCaminhoArquivo());
+                    fotoDto.setChatSessionId(foto.getChatSession() != null ? foto.getChatSession().getId() : null);
+                    fotoDto.setSinistroId(foto.getSinistro() != null ? foto.getSinistro().getId() : null);
+                    return fotoDto;
+                })
+                .toList();
         return SinistroDto.builder()
                 .id(entity.getId())
                 .problema(entity.getProblema())
@@ -60,6 +74,7 @@ public class SinistroDto {
                 .autoridadesAcionadas(entity.getAutoridadesAcionadas())
                 .veiculoImobilizado(entity.getVeiculoImobilizado())
                 .categoriaProblema(entity.getCategoriaProblema())
+                .fotos(fotoDtos)
                 .build();
     }
 }
