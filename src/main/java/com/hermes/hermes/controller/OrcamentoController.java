@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/orcamentos")
+@RequestMapping("/v1/orcamentos")
 public class OrcamentoController {
 
     @Autowired

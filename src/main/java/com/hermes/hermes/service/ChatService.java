@@ -28,6 +28,7 @@ public class ChatService {
     private final ChatMessageRepository messageRepository;
     private final WebClient webClient;
     private final ChatMessageRepository chatMessageRepository;
+    private final WebClient.Builder webClientBuilder;
     private SinistroRepository sinistroRepository;
 
     @Autowired
@@ -40,6 +41,7 @@ public class ChatService {
         this.messageRepository = messageRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.sinistroRepository = sinistroRepository;
+        this.webClientBuilder = builder;
     }
 
     public Map<String, Object> iniciarChat(Long userId) {
@@ -125,8 +127,10 @@ public class ChatService {
 
         assert respostaExterna != null;
 
+        GeocodingService geocodingService = new GeocodingService(webClientBuilder);
+
         if (Boolean.TRUE.equals(respostaExterna.get("conversa_finalizada"))) {
-          Sinistro sinistro = Sinistro.fromMap((LinkedHashMap<String, Object>) respostaExterna.get("resultado"));
+          Sinistro sinistro = Sinistro.fromMap((LinkedHashMap<String, Object>) respostaExterna.get("resultado"), geocodingService);
           sinistroRepository.save(sinistro);
           this.limparSessao(userId);
         }
