@@ -8,6 +8,7 @@ import com.hermes.hermes.exception.DuplicateResourceException;
 import com.hermes.hermes.exception.InvalidResourceStateException;
 import com.hermes.hermes.repository.UsuarioRepository;
 import com.hermes.hermes.service.UsuarioService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class ClienteRegistroService {
     private final ClienteService clienteService;
     private final UsuarioRepository usuarioRepository;
 
+    @Transactional
     public Cliente registrarCliente(ClienteRegistroRequestDto req) {
         validateRequest(req);
         if (usuarioRepository.existsByEmail(req.getEmail())) {
