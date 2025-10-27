@@ -47,6 +47,12 @@ public class Orcamento extends Entidade {
     @JoinColumn(name = "oficina_id")
     private Oficina oficina;
 
+    @Enumerated(EnumType.STRING)
+    private com.hermes.hermes.domain.model.oficina.OrcamentoStatus status = com.hermes.hermes.domain.model.oficina.OrcamentoStatus.PENDING;
+
+    @Column(length = 1000)
+    private String reviewNotes;
+
     @Override
     public Long getId() {
         return this.id;

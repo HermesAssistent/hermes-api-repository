@@ -14,4 +14,5 @@ public class OficinaResponseDto {
     private Double longitude;
     private String cep;
     private String telefone;
+    private java.util.List<com.hermes.hermes.controller.dto.SeguradoraResponseListagemDto> seguradoras;
 }

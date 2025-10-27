@@ -4,6 +4,8 @@ import com.hermes.hermes.controller.dto.OficinaRequestDto;
 import com.hermes.hermes.controller.dto.OficinaResponseDto;
 import com.hermes.hermes.domain.model.localizacao.Localizacao;
 import com.hermes.hermes.domain.model.oficina.Oficina;
+import com.hermes.hermes.domain.model.seguradora.Seguradora;
+import com.hermes.hermes.controller.dto.SeguradoraResponseListagemDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +18,15 @@ public class OficinaMapper {
         oficina.setEspecialidades(dto.getEspecialidades());
         // Localizacao constructor: (endereco, latitude, longitude, cep)
         oficina.setLocalizacao(new Localizacao(dto.getEndereco(), dto.getLatitude(), dto.getLongitude(), dto.getCep()));
+        if (dto.getSeguradoraIds() != null) {
+            java.util.Set<Seguradora> seguradoras = new java.util.HashSet<>();
+            for (Long id : dto.getSeguradoraIds()) {
+                Seguradora s = new Seguradora();
+                s.setId(id);
+                seguradoras.add(s);
+            }
+            oficina.setSeguradoras(seguradoras);
+        }
         return oficina;
     }
 
@@ -31,6 +42,12 @@ public class OficinaMapper {
             dto.setCep(oficina.getLocalizacao().getCep());
         }
         dto.setEspecialidades(oficina.getEspecialidades());
+        if (oficina.getSeguradoras() != null) {
+            java.util.List<SeguradoraResponseListagemDto> lista = oficina.getSeguradoras().stream()
+                    .map(SeguradoraResponseListagemDto::toDto)
+                    .toList();
+            dto.setSeguradoras(lista);
+        }
         return dto;
     }
 }

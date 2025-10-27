@@ -67,6 +67,21 @@ public class OrcamentoService {
         return orcamentoRepository.findBySinistroClienteId(clienteId);
     }
 
+    public Orcamento aceitar(Long id) {
+        Orcamento existente = orcamentoRepository.findById(id)
+                .orElseThrow(() -> new com.hermes.hermes.exception.NotFoundException("Orçamento não encontrado"));
+        existente.setStatus(com.hermes.hermes.domain.model.oficina.OrcamentoStatus.ACCEPTED);
+        return orcamentoRepository.save(existente);
+    }
+
+    public Orcamento revisar(Long id, String reviewNotes) {
+        Orcamento existente = orcamentoRepository.findById(id)
+                .orElseThrow(() -> new com.hermes.hermes.exception.NotFoundException("Orçamento não encontrado"));
+        existente.setStatus(com.hermes.hermes.domain.model.oficina.OrcamentoStatus.UNDER_REVIEW);
+        existente.setReviewNotes(reviewNotes);
+        return orcamentoRepository.save(existente);
+    }
+
     public Orcamento atualizar(Long id, Orcamento dados, Long sinistroId, Long oficinaId) {
         Orcamento existente = orcamentoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Orçamento não encontrado"));

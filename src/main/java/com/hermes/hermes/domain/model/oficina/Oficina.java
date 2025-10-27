@@ -6,6 +6,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.hermes.hermes.domain.model.seguradora.Seguradora;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -26,4 +30,10 @@ public class Oficina extends Entidade {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private java.util.List<String> especialidades;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "oficina_seguradora",
+            joinColumns = @JoinColumn(name = "oficina_id"),
+            inverseJoinColumns = @JoinColumn(name = "seguradora_id"))
+    private Set<Seguradora> seguradoras = new HashSet<>();
 }

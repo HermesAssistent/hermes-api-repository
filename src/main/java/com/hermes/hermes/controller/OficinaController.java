@@ -58,6 +58,17 @@ public class OficinaController {
         return ResponseEntity.ok(oficinas);
     }
 
+    @GetMapping("/seguradora/{seguradoraId}")
+    public ResponseEntity<List<OficinaResponseDto>> getOficinasPorSeguradora(@PathVariable Long seguradoraId) {
+        log.info("Listando oficinas para seguradora: {}", seguradoraId);
+
+        List<OficinaResponseDto> oficinas = oficinaService.findBySeguradora(seguradoraId).stream()
+                .map(oficinaMapper::toResponseDto)
+                .toList();
+
+        return ResponseEntity.ok(oficinas);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<OficinaResponseDto> getOficinaPorId(@PathVariable Long id) {
         log.info("Buscando oficina: {}", id);
@@ -100,6 +111,26 @@ public class OficinaController {
         Oficina oficina = oficinaMapper.toEntity(dto);
         Oficina atualizada = oficinaService.update(id, oficina);
 
+        return ResponseEntity.ok(oficinaMapper.toResponseDto(atualizada));
+    }
+
+    @PostMapping("/{id}/seguradoras/{seguradoraId}")
+    public ResponseEntity<OficinaResponseDto> adicionarSeguradora(
+            @PathVariable Long id,
+            @PathVariable Long seguradoraId) {
+        log.info("Adicionando seguradora {} à oficina {}", seguradoraId, id);
+
+        Oficina atualizada = oficinaService.addSeguradora(id, seguradoraId);
+        return ResponseEntity.ok(oficinaMapper.toResponseDto(atualizada));
+    }
+
+    @DeleteMapping("/{id}/seguradoras/{seguradoraId}")
+    public ResponseEntity<OficinaResponseDto> removerSeguradora(
+            @PathVariable Long id,
+            @PathVariable Long seguradoraId) {
+        log.info("Removendo seguradora {} da oficina {}", seguradoraId, id);
+
+        Oficina atualizada = oficinaService.removeSeguradora(id, seguradoraId);
         return ResponseEntity.ok(oficinaMapper.toResponseDto(atualizada));
     }
 

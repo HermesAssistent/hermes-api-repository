@@ -23,4 +23,5 @@ public class OficinaRequestDto {
 
     private Double longitude;
     private String telefone;
+    private java.util.List<Long> seguradoraIds;
 }

@@ -5,6 +5,8 @@ import com.hermes.hermes.domain.model.oficina.Oficina;
 import com.hermes.hermes.domain.model.sinistro.Sinistro;
 import com.hermes.hermes.exception.NotFoundException;
 import com.hermes.hermes.repository.OficinaRepository;
+import com.hermes.hermes.domain.model.seguradora.Seguradora;
+import com.hermes.hermes.repository.SeguradoraRepository;
 import com.hermes.hermes.repository.SinistroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,9 @@ public class OficinaService {
 
     @Autowired
     private OficinaRepository oficinaRepository;
+
+    @Autowired
+    private SeguradoraRepository seguradoraRepository;
 
     @Autowired
     private SinistroRepository sinistroRepository;
@@ -124,6 +129,10 @@ public class OficinaService {
         return oficinaRepository.findAll();
     }
 
+    public List<Oficina> findBySeguradora(Long seguradoraId) {
+        return oficinaRepository.findBySeguradoras_Id(seguradoraId);
+    }
+
     // Método para criar uma nova oficina
     public Oficina create(Oficina oficina) {
         if (oficina == null) {
@@ -181,6 +190,30 @@ public class OficinaService {
         }
 
         return oficinaRepository.save(existente);
+    }
+
+    // Adiciona uma seguradora à oficina (credenciamento)
+    public Oficina addSeguradora(Long oficinaId, Long seguradoraId) {
+    Oficina existente = oficinaRepository.findById(oficinaId)
+        .orElseThrow(() -> new NotFoundException("Oficina não encontrada"));
+
+    Seguradora seguradora = seguradoraRepository.findByIdAndAtivoIsTrue(seguradoraId)
+        .orElseThrow(() -> new NotFoundException("Seguradora não encontrada"));
+
+    existente.getSeguradoras().add(seguradora);
+    return oficinaRepository.save(existente);
+    }
+
+    // Remove o credenciamento de uma seguradora da oficina
+    public Oficina removeSeguradora(Long oficinaId, Long seguradoraId) {
+    Oficina existente = oficinaRepository.findById(oficinaId)
+        .orElseThrow(() -> new NotFoundException("Oficina não encontrada"));
+
+    Seguradora seguradora = seguradoraRepository.findById(seguradoraId)
+        .orElseThrow(() -> new NotFoundException("Seguradora não encontrada"));
+
+    existente.getSeguradoras().remove(seguradora);
+    return oficinaRepository.save(existente);
     }
 
     // Método para deletar uma oficina

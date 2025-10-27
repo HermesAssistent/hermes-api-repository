@@ -22,4 +22,6 @@ public class OrcamentoResponseDto {
     private Long sinistroId;
     private Long oficinaId;
     private List<PecaResponseDto> pecas;
+    private String status;
+    private String reviewNotes;
 }

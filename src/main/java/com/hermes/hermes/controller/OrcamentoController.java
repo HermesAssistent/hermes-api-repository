@@ -4,6 +4,7 @@ import com.hermes.hermes.controller.dto.OrcamentoRequestDto;
 import com.hermes.hermes.controller.dto.OrcamentoResponseDto;
 import com.hermes.hermes.controller.dto.PecaRequestDto;
 import com.hermes.hermes.controller.dto.PecaResponseDto;
+import com.hermes.hermes.controller.dto.ReviewRequestDto;
 import com.hermes.hermes.domain.model.oficina.Orcamento;
 import com.hermes.hermes.domain.model.oficina.Peca;
 import com.hermes.hermes.service.OrcamentoService;
@@ -57,6 +58,19 @@ public class OrcamentoController {
                 .map(this::mapToResponseDto)
                 .toList();
         return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/{id}/aceitar")
+    public ResponseEntity<OrcamentoResponseDto> aceitarOrcamento(@PathVariable Long id) {
+        Orcamento atualizado = orcamentoService.aceitar(id);
+        return ResponseEntity.ok(mapToResponseDto(atualizado));
+    }
+
+    @PostMapping("/{id}/revisar")
+    public ResponseEntity<OrcamentoResponseDto> revisarOrcamento(@PathVariable Long id,
+                                                                 @Valid @RequestBody ReviewRequestDto dto) {
+        Orcamento atualizado = orcamentoService.revisar(id, dto.getReviewNotes());
+        return ResponseEntity.ok(mapToResponseDto(atualizado));
     }
 
     @GetMapping("/oficina/{oficinaId}")
@@ -122,6 +136,9 @@ public class OrcamentoController {
                     .build()).toList();
             b.pecas(pecas);
         }
+
+        if (o.getStatus() != null) b.status(o.getStatus().name());
+        b.reviewNotes(o.getReviewNotes());
 
         return b.build();
     }

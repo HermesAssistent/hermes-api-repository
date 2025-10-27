@@ -34,7 +34,11 @@ public class GeocodingService {
                 .build(cep))
             .retrieve()
             .bodyToMono(String.class)
-            .timeout(Duration.ofSeconds(15));
+            .timeout(Duration.ofSeconds(20))
+            .onErrorResume(throwable -> {
+                System.err.println("Erro ao acessar BrasilAPI: " + throwable.getMessage());
+                return Mono.empty();
+            });
 
                 String brasilApiBody = brasilApiResponse.block();
 
@@ -48,8 +52,6 @@ public class GeocodingService {
                     throw new GeocodingException("CEP não encontrado na BrasilAPI. CEP fornecido: " + cep);
                 }
 
-        // A BrasilAPI pode retornar chaves em inglês (street, neighborhood, city, state)
-        // ou em português (logradouro, bairro, localidade, uf). Usamos fallback entre elas.
         String street = brasilApiJson.has("street") ? brasilApiJson.optString("street", "")
             : brasilApiJson.optString("logradouro", "");
         String neighborhood = brasilApiJson.has("neighborhood") ? brasilApiJson.optString("neighborhood", "")
@@ -76,7 +78,6 @@ public class GeocodingService {
 
         String endereco = enderecoBuilder.toString();
 
-                // Buscar latitude e longitude usando geocode.xyz
         Mono<String> geocodeResponse = geocodeClient.get()
             .uri(uriBuilder -> uriBuilder
                 .path("/{address}")
@@ -84,22 +85,36 @@ public class GeocodingService {
                 .build(endereco))
             .retrieve()
             .bodyToMono(String.class)
-            .timeout(Duration.ofSeconds(15));
+            .timeout(Duration.ofSeconds(20))
+            .onErrorResume(throwable -> {
+                System.err.println("Erro ao acessar geocode.xyz: " + throwable.getMessage());
+                return Mono.empty();
+            });
 
                 String geocodeBody = geocodeResponse.block();
 
-                if (geocodeBody == null) {
-                    throw new GeocodingException("A resposta da geocode.xyz foi nula. Verifique a conectividade ou o endereço fornecido: " + endereco);
+                Double latitude = null;
+                Double longitude = null;
+
+                if (geocodeBody != null) {
+                    JSONObject geocodeJson = new JSONObject(geocodeBody);
+
+                    if (geocodeJson.has("error") || !geocodeJson.has("latt") || !geocodeJson.has("longt")) {
+                        String errorMessage = geocodeJson.has("error")
+                            ? geocodeJson.getJSONObject("error").optString("description", "Erro desconhecido")
+                            : "Resposta inesperada da API geocode.xyz. Continuando com os dados da BrasilAPI.";
+                        System.err.println("Aviso: " + errorMessage);
+                    } else {
+                        try {
+                            latitude = Double.parseDouble(geocodeJson.getString("latt"));
+                            longitude = Double.parseDouble(geocodeJson.getString("longt"));
+                        } catch (NumberFormatException e) {
+                            System.err.println("Erro ao converter coordenadas retornadas pela geocode.xyz. Continuando com os dados da BrasilAPI. Resposta: " + geocodeJson.toString());
+                        }
+                    }
+                } else {
+                    System.err.println("Aviso: Resposta nula da geocode.xyz. Continuando com os dados da BrasilAPI.");
                 }
-
-                JSONObject geocodeJson = new JSONObject(geocodeBody);
-
-                if (geocodeJson.has("error")) {
-                    throw new GeocodingException("Erro ao buscar coordenadas na geocode.xyz: " + geocodeJson.getJSONObject("error").getString("description") + ". Endereço: " + endereco);
-                }
-
-                Double latitude = geocodeJson.has("latt") ? geocodeJson.getDouble("latt") : null;
-                Double longitude = geocodeJson.has("longt") ? geocodeJson.getDouble("longt") : null;
 
                 return new Localizacao(endereco, latitude, longitude, cep);
 
@@ -112,7 +127,7 @@ public class GeocodingService {
                 }
 
                 try {
-                    Thread.sleep(2000); // Aguardar antes de tentar novamente
+                    Thread.sleep(2000);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     throw new GeocodingException("Thread interrompida durante a espera entre tentativas.", ie);
