@@ -1,9 +1,12 @@
 package com.hermes.hermes.service.seguradora;
+import com.hermes.hermes.domain.model.cliente.Cliente;
 import com.hermes.hermes.domain.model.seguradora.Seguradora;
 import com.hermes.hermes.exception.DuplicateResourceException;
 import com.hermes.hermes.exception.InvalidResourceStateException;
 import com.hermes.hermes.exception.NotFoundException;
+import com.hermes.hermes.repository.ClienteRepository;
 import com.hermes.hermes.repository.SeguradoraRepository;
+import com.hermes.hermes.service.cliente.ClienteService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import java.util.Objects;
 public class SeguradoraService {
 
     private final SeguradoraRepository seguradoraRepository;
+    private final ClienteRepository  clienteRepository;
 
     public List<Seguradora> findAll() {
         log.info("Buscando todos as seguradoras ativos");
@@ -29,6 +33,10 @@ public class SeguradoraService {
         log.info("Buscando cliente com ID: {}", id);
         return seguradoraRepository.findByIdAndAtivoIsTrue(id)
                 .orElseThrow(() -> new NotFoundException("Seguradora não encontrada com ID: " + id));
+    }
+
+    public List<Cliente> findByClientesDaSeguradora(Long seguradoraId) {
+        return clienteRepository.findBySeguradora_Id(seguradoraId);
     }
 
     public Seguradora findByUsuarioId(Long usuarioId) {

@@ -42,6 +42,10 @@ public class ClienteService {
                 .orElseThrow(() -> new NotFoundException("Cliente não encontrado com usuário id: " + usuarioId));
     }
 
+    public List<Cliente> findBySeguradoraId(Long seguradoraId) {
+        return clienteRepository.findBySeguradora_Id(seguradoraId);
+    }
+
     public Cliente vincularClienteComSeguradora(Long seguradoraId, Long clienteId) {
         Cliente cliente = findById(clienteId);
         Seguradora seguradora = seguradoraService.findById(seguradoraId);

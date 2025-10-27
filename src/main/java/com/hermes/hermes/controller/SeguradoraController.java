@@ -1,4 +1,5 @@
 package com.hermes.hermes.controller;
+import com.hermes.hermes.controller.dto.ClienteResponseDto;
 import com.hermes.hermes.controller.dto.SeguradoraResponseListagemDto;
 import com.hermes.hermes.service.seguradora.SeguradoraService;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,10 @@ public class SeguradoraController {
     @GetMapping("/listar-para-clientes")
     public ResponseEntity<List<SeguradoraResponseListagemDto>> getSeguradorasParaClientes() {
         return ResponseEntity.ok(seguradoraService.findAll().stream().map(SeguradoraResponseListagemDto::toDto).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/listar-clientes/{seguradoraId}")
+    public ResponseEntity<List<ClienteResponseDto.ClienteDto>> getClientesDaSeguradora(@PathVariable String seguradoraId) {
+        return ResponseEntity.ok(seguradoraService.findByClientesDaSeguradora(Long.parseLong(seguradoraId)).stream().map(ClienteResponseDto.ClienteDto::from).collect(Collectors.toList()));
     }
 }

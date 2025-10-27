@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v1/auth/**").permitAll()
                         .requestMatchers("/v1/seguradora/listar-para-clientes/**").hasAnyAuthority("CLIENTE")
+                        .requestMatchers("/v1/seguradora/listar-clientes/**").hasAnyAuthority("SEGURADORA")
                         .requestMatchers("/v1/cliente/**").hasRole("CLIENTE")
                         .requestMatchers("/v1/seguradora/**").hasRole("SEGURADORA")
                         .anyRequest().authenticated()
