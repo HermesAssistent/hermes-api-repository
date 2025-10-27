@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request.getRequestURI());
     }
 
-    @ExceptionHandler(com.google.firebase.auth.FirebaseAuthException.class)
+    @ExceptionHandler(FirebaseAuthException.class)
     public ResponseEntity<ErrorResponse> handleFirebaseException(FirebaseAuthException ex, HttpServletRequest req) {
         return buildErrorResponse(ex, HttpStatus.UNAUTHORIZED, req.getRequestURI());
     }
@@ -75,6 +75,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExternalServiceException.class)
     public ResponseEntity<ErrorResponse> handleExternalException(ExternalServiceException ex, HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.BAD_GATEWAY, request.getRequestURI());
+    }
+
+    @ExceptionHandler(LLMGenerationException.class)
+    public ResponseEntity<ErrorResponse> handleLLMGenerationException(LLMGenerationException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI());
+    }
+
+    @ExceptionHandler(InvalidSQLException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSQLException(InvalidSQLException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request.getRequestURI());
+    }
+
+    @ExceptionHandler(SQLExecutionException.class)
+    public ResponseEntity<ErrorResponse> handleSQLExecutionException(SQLExecutionException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)

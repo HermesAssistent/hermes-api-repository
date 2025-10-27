@@ -1,6 +1,5 @@
 package com.hermes.hermes.controller;
 
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.hermes.hermes.controller.dto.ClienteRegistroRequestDto;
 import com.hermes.hermes.controller.dto.ClienteResponseDto;
@@ -9,13 +8,14 @@ import com.hermes.hermes.controller.dto.SeguradoraResponseDto;
 import com.hermes.hermes.domain.model.seguradora.Seguradora;
 import com.hermes.hermes.domain.model.usuario.Usuario;
 import com.hermes.hermes.domain.model.cliente.Cliente;
-import com.hermes.hermes.service.ChatService;
-import com.hermes.hermes.service.ClienteRegistroService;
-import com.hermes.hermes.service.SeguradoraRegistroService;
+import com.hermes.hermes.service.chat.ChatService;
+import com.hermes.hermes.service.cliente.ClienteRegistroService;
+import com.hermes.hermes.service.cliente.ClienteService;
+import com.hermes.hermes.service.seguradora.SeguradoraRegistroService;
 import com.hermes.hermes.service.UsuarioService;
 import com.hermes.hermes.service.auth.FirebaseAuthService;
+import com.hermes.hermes.service.seguradora.SeguradoraService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +27,8 @@ import java.util.HashMap;
 public class AuthController {
 
     private final ClienteRegistroService clienteRegistroService;
+    private final ClienteService clienteService;
+    private final SeguradoraService seguradoraService;
     private final SeguradoraRegistroService seguradoraRegistroService;
     private final UsuarioService usuarioService;
     private final FirebaseAuthService firebaseAuthService;
@@ -35,7 +37,7 @@ public class AuthController {
     @PostMapping("/registrar/cliente")
     public ResponseEntity<ClienteResponseDto> registrarCliente(@RequestBody ClienteRegistroRequestDto req) throws Exception {
         Cliente cliente = clienteRegistroService.registrarCliente(req);
-        ClienteResponseDto response = new ClienteResponseDto(cliente, null);
+        ClienteResponseDto response = new ClienteResponseDto(ClienteResponseDto.ClienteDto.from(cliente), null);
         return ResponseEntity.ok(response);
     }
 
@@ -54,6 +56,15 @@ public class AuthController {
         HashMap<String, Object> map = new HashMap<>();
         map.put("user", u);
         map.put("token", token);
+
+        if (u.getRole().equals("CLIENTE")) {
+            Cliente c = clienteService.findByUsuarioId(u.getId());
+            map.put("clienteId", c.getId());
+        } else {
+            Seguradora s = seguradoraService.findByUsuarioId(u.getId());
+            map.put("seguradoraId", s.getId());
+        }
+
         return ResponseEntity.ok(map);
     }
 

@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import com.hermes.hermes.exception.AuthenticationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,7 +20,7 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
             return FirebaseAuth.getInstance().createUser(request);
         } catch (FirebaseAuthException e) {
             log.error("Erro ao criar usuário no Firebase: {}", e.getMessage());
-            throw new AuthenticationException("Erro ao criar usuário no Firebase: " + e.getMessage());
+            throw new AuthenticationException(HttpStatus.BAD_REQUEST,"Erro ao criar usuário");
         }
     }
 
@@ -28,13 +29,13 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
         log.info("Verificando token Firebase");
         if (idToken == null || idToken.isEmpty()) {
             log.error("Token Firebase não fornecido");
-            throw new AuthenticationException("Token Firebase não fornecido ou vazio");
+            throw new AuthenticationException(HttpStatus.BAD_REQUEST,"Erro ao criar usuário");
         }
         try {
             return FirebaseAuth.getInstance().verifyIdToken(idToken);
         } catch (FirebaseAuthException e) {
             log.error("Erro ao verificar token Firebase: {}", e.getMessage());
-            throw new AuthenticationException("Token Firebase inválido: " + e.getMessage());
+            throw new AuthenticationException(HttpStatus.BAD_REQUEST,"Erro ao criar usuário");
         }
     }
 
@@ -43,13 +44,13 @@ public class FirebaseAuthServiceImpl implements FirebaseAuthService {
         log.info("Revogando refresh tokens para UID: {}", uid);
         if (uid == null || uid.isEmpty()) {
             log.error("UID não fornecido para revogação de tokens");
-            throw new AuthenticationException("UID não fornecido para revogação de tokens");
+            throw new AuthenticationException(HttpStatus.BAD_REQUEST,"Identificação do usuário não fornecida para revogação de tokens");
         }
         try {
             FirebaseAuth.getInstance().revokeRefreshTokens(uid);
         } catch (FirebaseAuthException e) {
             log.error("Erro ao revogar refresh tokens: {}", e.getMessage());
-            throw new AuthenticationException("Erro ao revogar refresh tokens: " + e.getMessage());
+            throw new AuthenticationException(HttpStatus.BAD_REQUEST,"Identificação do usuário não fornecida para revogação de tokens");
         }
     }
 }

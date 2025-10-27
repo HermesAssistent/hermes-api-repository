@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Seguradora extends Entidade {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seg_seguradora_seq")
@@ -19,7 +20,8 @@ public class Seguradora extends Entidade {
     @Column(unique = true, length = 20)
     private String cnpj;
     private String contato;
-
+    @Column(nullable = true)
+    private String razaoSocial;
     @OneToOne(optional = false)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
     private Usuario usuario;

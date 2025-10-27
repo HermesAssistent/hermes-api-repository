@@ -1,5 +1,6 @@
 package com.hermes.hermes.service;
 
+import com.hermes.hermes.controller.dto.FotoDto;
 import com.hermes.hermes.controller.dto.SinistroDto;
 import com.hermes.hermes.domain.model.sinistro.Sinistro;
 import com.hermes.hermes.exception.FileStorageException;
@@ -13,8 +14,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -103,7 +109,42 @@ public class RelatorioService {
         html = html.replace("{{TESTEMUNHAS}}", sinistro.getTestemunhas() != null ? sinistro.getTestemunhas() : "N/A");
         html = html.replace("{{AUTORIDADES}}", sinistro.getAutoridadesAcionadas() != null ? sinistro.getAutoridadesAcionadas() : "N/A");
 
+        String fotosHtml = gerarHtmlFotosBase64(sinistro.getFotos());
+        html = html.replace("{{FOTOS}}", fotosHtml);
+
         return html;
+    }
+
+    private String gerarHtmlFotosBase64(List<FotoDto> fotos) {
+        if (fotos == null || fotos.isEmpty()) {
+            return "<p style='color:#64748b; font-size:10pt;'>Nenhuma foto anexada ao relatório.</p>";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (FotoDto foto : fotos) {
+            try {
+                Path caminho = Paths.get(foto.getCaminhoArquivo());
+                byte[] bytes = Files.readAllBytes(caminho);
+                String base64 = Base64.getEncoder().encodeToString(bytes);
+
+                String contentType = Files.probeContentType(caminho);
+                if (contentType == null) contentType = "image/jpeg";
+
+                String nome = foto.getNomeArquivo() != null ? foto.getNomeArquivo() : "Foto";
+
+                sb.append("<div class='photo-card'>")
+                        .append("<img src='data:").append(contentType).append(";base64,")
+                        .append(base64)
+                        .append("' alt='").append(nome).append("'/>")
+                        .append("<p class='caption'>").append(nome).append("</p>")
+                        .append("</div>");
+            } catch (IOException e) {
+                sb.append("<p style='color:#991b1b;'>Erro ao carregar a foto: ")
+                        .append(foto.getNomeArquivo()).append("</p>");
+            }
+        }
+
+        return sb.toString();
     }
 
     private String determinarGravidadeClass(String gravidade) {

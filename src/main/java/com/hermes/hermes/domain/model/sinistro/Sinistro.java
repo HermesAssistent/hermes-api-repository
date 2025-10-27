@@ -58,6 +58,9 @@ public class Sinistro extends Entidade {
         if (map.containsKey("problema") && map.get("problema") != null)
             s.setProblema(map.get("problema").toString());
 
+        if (map.containsKey("local") && map.get("local") != null)
+            s.setLocal(map.get("local").toString());
+
         if (map.containsKey("data") && map.get("data") != null)
             s.setData(map.get("data").toString());
 
@@ -112,51 +115,9 @@ public class Sinistro extends Entidade {
         if (map.containsKey("categoria_problema") && map.get("categoria_problema") != null)
             s.setCategoriaProblema(map.get("categoria_problema").toString());
 
-        String endereco = null;
-        String cep = null;
-
-        if (map.containsKey("endereco") && map.get("endereco") != null)
-            endereco = map.get("endereco").toString();
-
-        if (map.containsKey("cep") && map.get("cep") != null)
-            cep = map.get("cep").toString();
-
-        if (cep == null && endereco != null) {
-            // Buscar o CEP e coordenadas usando o GeocodingService
-            Localizacao localizacao = geocodingService.getCoordinates(endereco);
-            cep = localizacao.getCep();
-            s.setLocalizacao(localizacao);
-        } else if (cep != null) {
-            // Buscar coordenadas com base no CEP
-            Localizacao localizacao = geocodingService.getCoordinates(cep);
-            s.setLocalizacao(localizacao);
-        }
-
-        if (cep == null || endereco == null) {
-            throw new IllegalArgumentException("CEP e endereço são obrigatórios para criar um Sinistro.");
-        }
-
-        Double latitude = null;
-        Double longitude = null;
-
-        try {
-            if (map.containsKey("latitude") && map.get("latitude") != null) {
-                latitude = map.get("latitude") instanceof String ? Double.valueOf(map.get("latitude").toString()) : (Double) map.get("latitude");
-            }
-
-            if (map.containsKey("longitude") && map.get("longitude") != null) {
-                longitude = map.get("longitude") instanceof String ? Double.valueOf(map.get("longitude").toString()) : (Double) map.get("longitude");
-            }
-        } catch (NumberFormatException e) {
-            System.err.println("Erro ao converter latitude ou longitude para Double: " + e.getMessage());
-        }
-
-        if (s.getLocalizacao() == null) {
-            s.setLocalizacao(new Localizacao(endereco, latitude, longitude, cep));
-        }
-
         return s;
     }
+
 
     @Override
     public String toString() {
