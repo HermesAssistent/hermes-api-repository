@@ -65,10 +65,11 @@ public class OficinaService {
     private double[] obterCoordenadasCliente(Sinistro sinistro) {
         if (sinistro.getCliente() != null && sinistro.getCliente().getLocalizacao() != null) {
             Localizacao localizacaoCliente = sinistro.getCliente().getLocalizacao();
-            if (localizacaoCliente.getEndereco() != null && !localizacaoCliente.getEndereco().isEmpty()) {
-                return converterEnderecoParaCoordenadas(localizacaoCliente.getEndereco());
-            } else if (localizacaoCliente.getCep() != null && !localizacaoCliente.getCep().isEmpty()) {
+            // Preferir CEP quando disponível para busca de coordenadas
+            if (localizacaoCliente.getCep() != null && !localizacaoCliente.getCep().isEmpty()) {
                 return converterEnderecoParaCoordenadas(localizacaoCliente.getCep());
+            } else if (localizacaoCliente.getEndereco() != null && !localizacaoCliente.getEndereco().isEmpty()) {
+                return converterEnderecoParaCoordenadas(localizacaoCliente.getEndereco());
             }
         }
         throw new IllegalArgumentException("Cliente ou localização do cliente não disponível para origem 'CASA'.");
@@ -130,15 +131,63 @@ public class OficinaService {
         }
 
         Localizacao localizacao = oficina.getLocalizacao();
-        if (localizacao == null || (localizacao.getEndereco() == null || localizacao.getEndereco().isEmpty())) {
-            throw new IllegalArgumentException("O endereço da oficina deve ser fornecido.");
+        if (localizacao == null || ((localizacao.getEndereco() == null || localizacao.getEndereco().isEmpty())
+                && (localizacao.getCep() == null || localizacao.getCep().isEmpty()))) {
+            throw new IllegalArgumentException("O endereço ou CEP da oficina deve ser fornecido.");
         }
 
-        // Obtendo as coordenadas com base no endereço
-        Localizacao coordenadas = geocodingService.getCoordinates(localizacao.getEndereco());
-        localizacao.setLatitude(coordenadas.getLatitude());
-        localizacao.setLongitude(coordenadas.getLongitude());
+        // Obtendo as coordenadas: preferir CEP quando presente, senão usar endereço
+        String consulta = (localizacao.getCep() != null && !localizacao.getCep().isEmpty())
+                ? localizacao.getCep() : localizacao.getEndereco();
+        Localizacao coordenadas = geocodingService.getCoordinates(consulta);
+        if (coordenadas != null) {
+            localizacao.setLatitude(coordenadas.getLatitude());
+            localizacao.setLongitude(coordenadas.getLongitude());
+        }
 
         return oficinaRepository.save(oficina);
+    }
+
+    // Método para buscar oficina por id
+    public Oficina findById(Long id) {
+        return oficinaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Oficina não encontrada"));
+    }
+
+    // Método para atualizar uma oficina
+    public Oficina update(Long id, Oficina oficina) {
+        Oficina existente = oficinaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Oficina não encontrada"));
+
+        // Atualiza campos básicos
+        existente.setNome(oficina.getNome());
+        existente.setTelefone(oficina.getTelefone());
+        existente.setEspecialidades(oficina.getEspecialidades());
+
+        // Atualiza localização se fornecida (preferir CEP quando disponível)
+        if (oficina.getLocalizacao() != null) {
+            Localizacao localizacao = oficina.getLocalizacao();
+            if ((localizacao.getCep() != null && !localizacao.getCep().isEmpty())
+                    || (localizacao.getEndereco() != null && !localizacao.getEndereco().isEmpty())) {
+                String consulta = (localizacao.getCep() != null && !localizacao.getCep().isEmpty())
+                        ? localizacao.getCep() : localizacao.getEndereco();
+                Localizacao coordenadas = geocodingService.getCoordinates(consulta);
+                if (coordenadas != null) {
+                    localizacao.setLatitude(coordenadas.getLatitude());
+                    localizacao.setLongitude(coordenadas.getLongitude());
+                }
+            }
+            existente.setLocalizacao(localizacao);
+        }
+
+        return oficinaRepository.save(existente);
+    }
+
+    // Método para deletar uma oficina
+    public void delete(Long id) {
+        if (!oficinaRepository.existsById(id)) {
+            throw new NotFoundException("Oficina não encontrada");
+        }
+        oficinaRepository.deleteById(id);
     }
 }

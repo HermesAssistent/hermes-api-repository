@@ -13,11 +13,12 @@ import java.time.Duration;
 public class GeocodingService {
 
 
-    private final WebClient webClient;
-
+    private final WebClient brasilClient;
+    private final WebClient geocodeClient;
 
     public GeocodingService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("https://brasilapi.com.br/api").build();
+        this.brasilClient = webClientBuilder.baseUrl("https://brasilapi.com.br/api").build();
+        this.geocodeClient = webClientBuilder.baseUrl("https://geocode.xyz").build();
     }
 
     public Localizacao getCoordinates(String cep) {
@@ -26,14 +27,14 @@ public class GeocodingService {
 
         while (attempt < maxRetries) {
             try {
-                // Buscar endereço e CEP usando BrasilAPI
-                Mono<String> brasilApiResponse = webClient.get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("/cep/v1/{cep}")
-                                .build(cep))
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .timeout(Duration.ofSeconds(15));
+        // Buscar endereço e CEP usando BrasilAPI
+        Mono<String> brasilApiResponse = brasilClient.get()
+            .uri(uriBuilder -> uriBuilder
+                .path("/cep/v1/{cep}")
+                .build(cep))
+            .retrieve()
+            .bodyToMono(String.class)
+            .timeout(Duration.ofSeconds(15));
 
                 String brasilApiBody = brasilApiResponse.block();
 
@@ -47,20 +48,43 @@ public class GeocodingService {
                     throw new GeocodingException("CEP não encontrado na BrasilAPI. CEP fornecido: " + cep);
                 }
 
-                String endereco = brasilApiJson.getString("logradouro") + ", " +
-                                  brasilApiJson.getString("bairro") + ", " +
-                                  brasilApiJson.getString("localidade") + " - " +
-                                  brasilApiJson.getString("uf");
+        // A BrasilAPI pode retornar chaves em inglês (street, neighborhood, city, state)
+        // ou em português (logradouro, bairro, localidade, uf). Usamos fallback entre elas.
+        String street = brasilApiJson.has("street") ? brasilApiJson.optString("street", "")
+            : brasilApiJson.optString("logradouro", "");
+        String neighborhood = brasilApiJson.has("neighborhood") ? brasilApiJson.optString("neighborhood", "")
+            : brasilApiJson.optString("bairro", "");
+        String city = brasilApiJson.has("city") ? brasilApiJson.optString("city", "")
+            : brasilApiJson.optString("localidade", "");
+        String state = brasilApiJson.has("state") ? brasilApiJson.optString("state", "")
+            : brasilApiJson.optString("uf", "");
+
+        StringBuilder enderecoBuilder = new StringBuilder();
+        if (!street.isBlank()) enderecoBuilder.append(street);
+        if (!neighborhood.isBlank()) {
+            if (enderecoBuilder.length() > 0) enderecoBuilder.append(", ");
+            enderecoBuilder.append(neighborhood);
+        }
+        if (!city.isBlank()) {
+            if (enderecoBuilder.length() > 0) enderecoBuilder.append(", ");
+            enderecoBuilder.append(city);
+        }
+        if (!state.isBlank()) {
+            if (enderecoBuilder.length() > 0) enderecoBuilder.append(" - ");
+            enderecoBuilder.append(state);
+        }
+
+        String endereco = enderecoBuilder.toString();
 
                 // Buscar latitude e longitude usando geocode.xyz
-                Mono<String> geocodeResponse = webClient.get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("/{address}")
-                                .queryParam("json", "1")
-                                .build(endereco))
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .timeout(Duration.ofSeconds(15));
+        Mono<String> geocodeResponse = geocodeClient.get()
+            .uri(uriBuilder -> uriBuilder
+                .path("/{address}")
+                .queryParam("json", "1")
+                .build(endereco))
+            .retrieve()
+            .bodyToMono(String.class)
+            .timeout(Duration.ofSeconds(15));
 
                 String geocodeBody = geocodeResponse.block();
 

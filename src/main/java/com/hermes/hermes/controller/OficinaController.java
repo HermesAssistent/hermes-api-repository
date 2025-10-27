@@ -1,41 +1,113 @@
 package com.hermes.hermes.controller;
 
+import com.hermes.hermes.controller.dto.OficinaRequestDto;
+import com.hermes.hermes.controller.dto.OficinaResponseDto;
+import com.hermes.hermes.controller.mapper.OficinaMapper;
 import com.hermes.hermes.domain.model.oficina.Oficina;
 import com.hermes.hermes.service.OficinaService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.hermes.hermes.service.GeocodingService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/oficinas")
+@RequestMapping("/v1/oficinas")
+@RequiredArgsConstructor
+@Slf4j
 public class OficinaController {
 
-    @Autowired
-    private OficinaService oficinaService;
+    private final OficinaService oficinaService;
+    private final OficinaMapper oficinaMapper;
+    private final GeocodingService geocodingService;
 
     @GetMapping("/proximas/{sinistroId}")
-    public ResponseEntity<List<Oficina>> getOficinasProximas(
+    public ResponseEntity<List<OficinaResponseDto>> getOficinasProximas(
             @PathVariable Long sinistroId,
             @RequestParam("origem") OficinaService.OrigemBusca origem,
             @RequestParam(value = "lat", required = false) Double lat,
             @RequestParam(value = "lon", required = false) Double lon,
             @RequestParam(value = "endereco", required = false) String endereco) {
 
-        List<Oficina> oficinas = oficinaService.findOficinasProximas(sinistroId, origem, lat, lon, endereco);
+        log.info("Buscando oficinas próximas ao sinistro: {}, origem: {}",
+                sinistroId, origem);
+
+        List<OficinaResponseDto> oficinas = oficinaService
+                .findOficinasProximas(sinistroId, origem, lat, lon, endereco)
+                .stream()
+                .map(oficinaMapper::toResponseDto)
+                .toList();
+
         return ResponseEntity.ok(oficinas);
     }
 
     @GetMapping
-    public ResponseEntity<List<Oficina>> getOficinas() {
-        List<Oficina> oficinas = oficinaService.findAll();
+    public ResponseEntity<List<OficinaResponseDto>> getOficinas() {
+        log.info("Listando todas as oficinas");
+
+        List<OficinaResponseDto> oficinas = oficinaService
+                .findAll()
+                .stream()
+                .map(oficinaMapper::toResponseDto)
+                .toList();
+
         return ResponseEntity.ok(oficinas);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<OficinaResponseDto> getOficinaPorId(@PathVariable Long id) {
+        log.info("Buscando oficina: {}", id);
+
+        Oficina oficina = oficinaService.findById(id);
+        return ResponseEntity.ok(oficinaMapper.toResponseDto(oficina));
+    }
+
     @PostMapping
-    public ResponseEntity<Oficina> criarOficina(@RequestBody Oficina oficina) {
+    public ResponseEntity<OficinaResponseDto> criarOficina(
+            @Valid @RequestBody OficinaRequestDto dto) {
+        log.info("Criando nova oficina: {}", dto.getNome());
+
+        Oficina oficina = oficinaMapper.toEntity(dto);
+        // Se o CEP foi informado, usar o GeocodingService para obter endereço completo e coordenadas
+        try {
+            if (dto.getCep() != null && !dto.getCep().isEmpty()) {
+                var localizacao = geocodingService.getCoordinates(dto.getCep());
+                if (localizacao != null) {
+                    oficina.setLocalizacao(localizacao);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Não foi possível obter endereço/coordenadas pelo CEP {}: {}", dto.getCep(), e.getMessage());
+            // Continua sem lançar erro — a service ainda tentará geocodificar caso necessário
+        }
         Oficina novaOficina = oficinaService.create(oficina);
-        return ResponseEntity.status(201).body(novaOficina);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(oficinaMapper.toResponseDto(novaOficina));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OficinaResponseDto> atualizarOficina(
+            @PathVariable Long id,
+            @Valid @RequestBody OficinaRequestDto dto) {
+        log.info("Atualizando oficina: {}", id);
+
+        Oficina oficina = oficinaMapper.toEntity(dto);
+        Oficina atualizada = oficinaService.update(id, oficina);
+
+        return ResponseEntity.ok(oficinaMapper.toResponseDto(atualizada));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarOficina(@PathVariable Long id) {
+        log.info("Deletando oficina: {}", id);
+
+        oficinaService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

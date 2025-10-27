@@ -10,4 +10,5 @@ import java.util.List;
 public interface OrcamentoRepository extends JpaRepository<Orcamento, Long> {
     List<Orcamento> findBySinistroId(Long sinistroId);
     List<Orcamento> findByOficinaId(Long oficinaId);
+    List<Orcamento> findBySinistroClienteId(Long clienteId);
 }

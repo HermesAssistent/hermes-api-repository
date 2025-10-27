@@ -1,6 +1,7 @@
 package com.hermes.hermes.domain.model.oficina;
 
 import com.hermes.hermes.domain.model.abstracts.Entidade;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,7 @@ public class Peca extends Entidade {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orcamento_id")
+    @JsonIgnore
     private Orcamento orcamento;
 
     @Override

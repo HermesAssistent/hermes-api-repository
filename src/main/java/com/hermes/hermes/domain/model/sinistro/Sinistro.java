@@ -58,8 +58,15 @@ public class Sinistro extends Entidade {
         if (map.containsKey("problema") && map.get("problema") != null)
             s.setProblema(map.get("problema").toString());
 
-        if (map.containsKey("local") && map.get("local") != null)
-            s.setLocal(map.get("local").toString());
+        if (map.containsKey("local") && map.get("local") != null) {
+            String cep = map.get("local").toString();
+            try {
+                Localizacao localizacao = geocodingService.getCoordinates(cep);
+                s.setLocalizacao(localizacao);
+            } catch (Exception e) {
+                System.err.println("Erro ao obter localização: " + e.getMessage());
+            }
+        }
 
         if (map.containsKey("data") && map.get("data") != null)
             s.setData(map.get("data").toString());

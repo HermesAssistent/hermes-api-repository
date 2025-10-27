@@ -59,6 +59,14 @@ public class OrcamentoService {
         return orcamentoRepository.findByOficinaId(oficinaId);
     }
 
+    public List<Orcamento> listarTodos() {
+        return orcamentoRepository.findAll();
+    }
+
+    public List<Orcamento> listarPorCliente(Long clienteId) {
+        return orcamentoRepository.findBySinistroClienteId(clienteId);
+    }
+
     public Orcamento atualizar(Long id, Orcamento dados, Long sinistroId, Long oficinaId) {
         Orcamento existente = orcamentoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Orçamento não encontrado"));
