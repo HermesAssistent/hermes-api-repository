@@ -39,19 +39,19 @@ public class DashboardService {
             Long sinistrosAtivos = sinistroRepository.countSinistrosAtivos();
 
             // Buscar contagem por gravidade
-            Long leve = sinistroRepository.countByGravidade("BAIXA");
-            Long moderada = sinistroRepository.countByGravidade("MODERADA");
-            Long grave = sinistroRepository.countByGravidade("GRAVE");
+            Long baixa = sinistroRepository.countByGravidadeEqualsIgnoreCase("BAIXA");
+            Long moderada = sinistroRepository.countByGravidadeEqualsIgnoreCase("MODERADA");
+            Long alta = sinistroRepository.countByGravidadeEqualsIgnoreCase("ALTA");
 
             // Garantir que valores não sejam null
-            leve = leve != null ? leve : 0L;
+            baixa = baixa != null ? baixa : 0L;
             moderada = moderada != null ? moderada : 0L;
-            grave = grave != null ? grave : 0L;
+            alta = alta != null ? alta : 0L;
 
             GravidadeStatsDTO gravidade = GravidadeStatsDTO.builder()
-                    .leve(leve)
+                    .baixa(baixa)
                     .moderada(moderada)
-                    .grave(grave)
+                    .alta(alta)
                     .build();
 
             return DashboardStatsDTO.builder()

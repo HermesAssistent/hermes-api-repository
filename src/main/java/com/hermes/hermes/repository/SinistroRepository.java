@@ -18,6 +18,8 @@ public interface SinistroRepository extends JpaRepository<Sinistro, Long> {
     // Contagem por gravidade
     Long countByGravidade(String gravidade);
 
+    Long countByGravidadeEqualsIgnoreCase(String gravidade);
+
     // Contagem de sinistros ativos (considerando sinistros dos últimos 30 dias como ativos)
     @Query("SELECT COUNT(s) FROM Sinistro s WHERE s.ativo = true")
     Long countSinistrosAtivos();

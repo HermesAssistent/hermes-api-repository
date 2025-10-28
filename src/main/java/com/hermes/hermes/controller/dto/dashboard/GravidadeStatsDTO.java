@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GravidadeStatsDTO {
-    private Long leve;
+    private Long baixa;
     private Long moderada;
-    private Long grave;
+    private Long alta;
 }
