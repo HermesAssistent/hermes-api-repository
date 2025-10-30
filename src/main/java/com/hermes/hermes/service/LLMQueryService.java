@@ -59,6 +59,10 @@ public class LLMQueryService {
             return gerarFallbackSQL(pergunta);
         }
 
+        if (sql != null &&  sql.contains(";")) {
+            sql = sql.substring(0, sql.indexOf(";"));
+        }
+
         return sql;
     }
 
@@ -312,7 +316,7 @@ public class LLMQueryService {
 
         if (pergunta.contains("quantos") && pergunta.contains("sinistro")) {
             if (pergunta.contains("ferido")) {
-                return "SELECT COUNT(*) FROM sinistro WHERE ferido = true;";
+                return "SELECT COUNT(*) FROM sinistro WHERE feridos = true;";
             } else if (pergunta.contains("ativo")) {
                 return "SELECT COUNT(*) FROM sinistro WHERE ativo = true;";
             } else {
@@ -320,7 +324,7 @@ public class LLMQueryService {
             }
         } else if (pergunta.contains("listar") && pergunta.contains("sinistro")) {
             if (pergunta.contains("ferido")) {
-                return "SELECT * FROM sinistro WHERE ferido = true LIMIT 10;";
+                return "SELECT * FROM sinistro WHERE feridos = true LIMIT 10;";
             } else {
                 return "SELECT * FROM sinistro LIMIT 10;";
             }
@@ -425,8 +429,8 @@ public class LLMQueryService {
         }
 
         private String extrairNomeTabela(Class<?> entidade) {
-            if (entidade.isAnnotationPresent(Table.class)) {
-                Table tabela = entidade.getAnnotation(Table.class);
+            if (entidade.isAnnotationPresent(Entity.class)) {
+                Entity tabela = entidade.getAnnotation(Entity.class);
                 if (!tabela.name().isEmpty()) {
                     return tabela.name();
                 }
