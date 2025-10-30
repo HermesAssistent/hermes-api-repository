@@ -3,6 +3,8 @@ package com.hermes.hermes.domain.model.sinistro;
 import com.hermes.hermes.domain.model.abstracts.Entidade;
 import com.hermes.hermes.domain.model.chat.Foto;
 import com.hermes.hermes.domain.model.cliente.Cliente;
+import com.hermes.hermes.domain.model.localizacao.Localizacao;
+import com.hermes.hermes.service.GeocodingService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +28,6 @@ public class Sinistro extends Entidade {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
     private String problema;
-    private String local;
     private String data;
     private String hora;
     private String modeloVeiculo;
@@ -45,20 +46,27 @@ public class Sinistro extends Entidade {
     private String autoridadesAcionadas;
     private String veiculoImobilizado;
     private String categoriaProblema;
-    private Double latitude;
-    private Double longitude;
 
     @OneToMany(mappedBy = "sinistro", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Foto> fotos;
+    @Embedded
+    private Localizacao localizacao;
 
-    public static Sinistro fromMap(LinkedHashMap<String, Object> map) {
+    public static Sinistro fromMap(LinkedHashMap<String, Object> map, GeocodingService geocodingService) {
         Sinistro s = new Sinistro();
 
         if (map.containsKey("problema") && map.get("problema") != null)
             s.setProblema(map.get("problema").toString());
 
-        if (map.containsKey("local") && map.get("local") != null)
-            s.setLocal(map.get("local").toString());
+        if (map.containsKey("local") && map.get("local") != null) {
+            String cep = map.get("local").toString();
+            try {
+                Localizacao localizacao = geocodingService.getCoordinates(cep);
+                s.setLocalizacao(localizacao);
+            } catch (Exception e) {
+                System.err.println("Erro ao obter localização: " + e.getMessage());
+            }
+        }
 
         if (map.containsKey("data") && map.get("data") != null)
             s.setData(map.get("data").toString());
@@ -122,7 +130,6 @@ public class Sinistro extends Entidade {
     public String toString() {
         return "Sinistro{" +
                 "problema='" + problema + '\'' +
-                ", local='" + local + '\'' +
                 ", data='" + data + '\'' +
                 ", hora='" + hora + '\'' +
                 ", modeloVeiculo='" + modeloVeiculo + '\'' +

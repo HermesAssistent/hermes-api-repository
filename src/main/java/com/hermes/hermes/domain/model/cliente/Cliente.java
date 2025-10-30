@@ -1,6 +1,7 @@
 package com.hermes.hermes.domain.model.cliente;
 
 import com.hermes.hermes.domain.model.abstracts.Entidade;
+import com.hermes.hermes.domain.model.localizacao.Localizacao;
 import com.hermes.hermes.domain.model.seguradora.Seguradora;
 import com.hermes.hermes.domain.model.usuario.Usuario;
 import jakarta.persistence.*;
@@ -34,4 +35,11 @@ public class Cliente extends Entidade {
     private Double latitude;
 
     private Double longitude;
+
+    public Localizacao getLocalizacao() {
+        if (latitude != null && longitude != null) {
+            return new Localizacao(null, latitude, longitude, null);
+        }
+        return null;
+    }
 }

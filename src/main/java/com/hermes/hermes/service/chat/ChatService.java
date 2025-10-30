@@ -10,6 +10,7 @@ import com.hermes.hermes.repository.ChatMessageRepository;
 import com.hermes.hermes.repository.ChatSessionRepository;
 import com.hermes.hermes.repository.SinistroRepository;
 import com.hermes.hermes.service.FotoService;
+import com.hermes.hermes.service.GeocodingService;
 import com.hermes.hermes.service.cliente.ClienteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,12 +35,13 @@ public class ChatService {
     private SinistroRepository sinistroRepository;
     private final FotoService fotoService;
     private final ClienteService clienteService;
+    private final GeocodingService geocodingService;
 
     @Autowired
     public ChatService(WebClient.Builder builder,
                        ChatSessionRepository sessionRepository,
                        ChatMessageRepository messageRepository,
-                       ChatMessageRepository chatMessageRepository, SinistroRepository sinistroRepository, FotoService fotoService, ClienteService clienteService) {
+                       ChatMessageRepository chatMessageRepository, SinistroRepository sinistroRepository, FotoService fotoService, ClienteService clienteService, GeocodingService geocodingService) {
         this.webClient = builder.baseUrl("http://localhost:8000").build();
         this.sessionRepository = sessionRepository;
         this.messageRepository = messageRepository;
@@ -47,6 +49,7 @@ public class ChatService {
         this.sinistroRepository = sinistroRepository;
         this.fotoService = fotoService;
         this.clienteService = clienteService;
+        this.geocodingService = geocodingService;
     }
 
     public Map<String, Object> iniciarChat(Long userId) {
@@ -133,7 +136,8 @@ public class ChatService {
         assert respostaExterna != null;
 
         if (Boolean.TRUE.equals(respostaExterna.get("conversa_finalizada"))) {
-          Sinistro sinistro = Sinistro.fromMap((LinkedHashMap<String, Object>) respostaExterna.get("resultado"));
+          Sinistro sinistro = Sinistro.fromMap((LinkedHashMap<String, Object>) respostaExterna.get("resultado"),
+                  geocodingService);
           Cliente cliente = clienteService.findByUsuarioId(userId);
           sinistro.setCliente(cliente);
           sinistroRepository.save(sinistro);

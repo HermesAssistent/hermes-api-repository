@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface OficinaRepository extends JpaRepository<Oficina, Long> {
     List<Oficina> findByEspecialidadesContaining(String especialidade);
+    List<Oficina> findBySeguradoras_Id(Long seguradoraId);
 }

@@ -96,4 +96,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI());
     }
+
+    @ExceptionHandler(GeocodingException.class)
+    public ResponseEntity<String> handleGeocodingException(GeocodingException ex) {
+        return new ResponseEntity<>("Erro de geocodificação: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

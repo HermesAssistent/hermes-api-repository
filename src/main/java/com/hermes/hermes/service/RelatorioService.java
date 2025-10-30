@@ -195,7 +195,12 @@ public class RelatorioService {
             }
         }
 
-        return valor.toString();
+        // Adicionado para lidar com valores inesperados
+        if (valor instanceof Boolean || valor instanceof String) {
+            return valor.toString();
+        }
+
+        throw new IllegalArgumentException("Tipo de valor não suportado para formatarBoolean: " + valor.getClass().getName());
     }
 
     private String formatarBadge(Object valor) {

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
-@RequestMapping("v1/seguradora")
+@RequestMapping("/v1/seguradoras")
 @RequiredArgsConstructor
 public class SeguradoraController {
     private final SeguradoraService seguradoraService;
