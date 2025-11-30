@@ -1,7 +1,8 @@
 package com.hermes.hermes.controller;
 
-import com.hermes.hermes.controller.dto.SinistroDto;
-import com.hermes.hermes.service.SinistroService;
+import com.hermes.hermes.controller.dto.sinistro.SinistroBaseDto;
+import com.hermes.hermes.domain.model.sinistro.SinistroBase;
+import com.hermes.hermes.service.sinistro.SinistroService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +21,13 @@ public class SinistroController {
     private final SinistroService sinistroService;
 
     @GetMapping
-    public List<SinistroDto> listarSinistros() {
-        return sinistroService.findAll().stream().map(SinistroDto::fromEntity).toList();
+    public List<SinistroBaseDto> listarSinistros() {
+        return sinistroService.findAll().stream().map(SinistroBase::toDto).toList();
     }
 
     @GetMapping("/{id}")
-    public List<SinistroDto> listarSinistrosDoCliente(@PathVariable String id) {
-        return sinistroService.findByClienteId(id).stream().map(SinistroDto::fromEntity).toList();
+    public List<SinistroBaseDto> listarSinistrosDoCliente(@PathVariable String id) {
+        return sinistroService.findByClienteId(id).stream().map(SinistroBase::toDto).toList();
     }
 
 }

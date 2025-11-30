@@ -1,7 +1,7 @@
 package com.hermes.hermes.domain.model.oficina;
 
 import com.hermes.hermes.domain.model.abstracts.Entidade;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroAutomotivo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,7 +41,7 @@ public class Orcamento extends Entidade {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sinistro_id")
-    private Sinistro sinistro;
+    private SinistroAutomotivo sinistro;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "oficina_id")

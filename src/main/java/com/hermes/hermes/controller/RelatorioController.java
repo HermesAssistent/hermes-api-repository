@@ -19,9 +19,9 @@ import java.io.*;
 public class RelatorioController {
     private final RelatorioService relatorioService;
 
-    @GetMapping("/sinistro/{id}")
-    public ResponseEntity<byte[]> gerarRelatorio(@PathVariable Long id) {
-        byte[] pdfBytes = relatorioService.gerarPdf(id);
+    @GetMapping("/sinistro/{id}/{tipoSinistro}")
+    public ResponseEntity<byte[]> gerarRelatorio(@PathVariable Long id, @PathVariable String tipoSinistro) {
+        byte[] pdfBytes = relatorioService.gerarPdf(id, tipoSinistro);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

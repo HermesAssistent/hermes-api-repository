@@ -2,18 +2,17 @@ package com.hermes.hermes.service;
 
 import com.hermes.hermes.domain.model.localizacao.Localizacao;
 import com.hermes.hermes.domain.model.oficina.Oficina;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroAutomotivo;
 import com.hermes.hermes.exception.NotFoundException;
 import com.hermes.hermes.repository.OficinaRepository;
 import com.hermes.hermes.domain.model.seguradora.Seguradora;
 import com.hermes.hermes.repository.SeguradoraRepository;
-import com.hermes.hermes.repository.SinistroRepository;
+import com.hermes.hermes.repository.sinistro.SinistroAutomotivoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +25,7 @@ public class OficinaService {
     private SeguradoraRepository seguradoraRepository;
 
     @Autowired
-    private SinistroRepository sinistroRepository;
+    private SinistroAutomotivoRepository sinistroAutomotivoRepository;
 
     @Autowired
     private GeocodingService geocodingService;
@@ -38,7 +37,7 @@ public class OficinaService {
 
     // Método para encontrar oficinas próximas
     public List<Oficina> findOficinasProximas(Long sinistroId, OrigemBusca origem, Double lat, Double lon, String endereco) {
-        Sinistro sinistro = buscarSinistroPorId(sinistroId);
+        SinistroAutomotivo sinistro = buscarSinistroPorId(sinistroId);
         String especialidade = sinistro.getCategoriaProblema();
         List<Oficina> oficinasEspecializadas = oficinaRepository.findByEspecialidadesContaining(especialidade);
 
@@ -49,12 +48,12 @@ public class OficinaService {
         return ordenarOficinasPorDistancia(oficinasEspecializadas, latOrigem, lonOrigem);
     }
 
-    private Sinistro buscarSinistroPorId(Long sinistroId) {
-        return sinistroRepository.findById(sinistroId)
+    private SinistroAutomotivo buscarSinistroPorId(Long sinistroId) {
+        return sinistroAutomotivoRepository.findById(sinistroId)
                 .orElseThrow(() -> new NotFoundException("Sinistro não encontrado"));
     }
 
-    private double[] determinarCoordenadasOrigem(OrigemBusca origem, Sinistro sinistro, Double lat, Double lon, String endereco) {
+    private double[] determinarCoordenadasOrigem(OrigemBusca origem, SinistroAutomotivo sinistro, Double lat, Double lon, String endereco) {
         switch (origem) {
             case CASA:
                 return obterCoordenadasCliente(sinistro);
@@ -67,7 +66,7 @@ public class OficinaService {
         }
     }
 
-    private double[] obterCoordenadasCliente(Sinistro sinistro) {
+    private double[] obterCoordenadasCliente(SinistroAutomotivo sinistro) {
         if (sinistro.getCliente() != null && sinistro.getCliente().getLocalizacao() != null) {
             Localizacao localizacaoCliente = sinistro.getCliente().getLocalizacao();
             // Preferir CEP quando disponível para busca de coordenadas

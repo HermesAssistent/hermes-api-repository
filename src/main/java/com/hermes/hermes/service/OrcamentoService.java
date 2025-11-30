@@ -3,11 +3,11 @@ package com.hermes.hermes.service;
 import com.hermes.hermes.domain.model.oficina.Orcamento;
 import com.hermes.hermes.domain.model.oficina.Peca;
 import com.hermes.hermes.domain.model.oficina.Oficina;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroAutomotivo;
 import com.hermes.hermes.exception.NotFoundException;
 import com.hermes.hermes.repository.OrcamentoRepository;
 import com.hermes.hermes.repository.OficinaRepository;
-import com.hermes.hermes.repository.SinistroRepository;
+import com.hermes.hermes.repository.sinistro.SinistroAutomotivoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +22,14 @@ public class OrcamentoService {
     private OrcamentoRepository orcamentoRepository;
 
     @Autowired
-    private SinistroRepository sinistroRepository;
+    private SinistroAutomotivoRepository sinistroRepository;
 
     @Autowired
     private OficinaRepository oficinaRepository;
 
     public Orcamento salvar(Orcamento orcamento, Long sinistroId, Long oficinaId) {
         if (sinistroId != null) {
-            Sinistro s = sinistroRepository.findById(sinistroId)
+            SinistroAutomotivo s = sinistroRepository.findById(sinistroId)
                     .orElseThrow(() -> new NotFoundException("Sinistro não encontrado"));
             orcamento.setSinistro(s);
         }
@@ -92,7 +92,7 @@ public class OrcamentoService {
         existente.setPrazo(dados.getPrazo());
 
         if (sinistroId != null) {
-            Sinistro s = sinistroRepository.findById(sinistroId)
+            SinistroAutomotivo s = sinistroRepository.findById(sinistroId)
                     .orElseThrow(() -> new NotFoundException("Sinistro não encontrado"));
             existente.setSinistro(s);
         }
