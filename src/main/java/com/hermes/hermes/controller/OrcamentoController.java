@@ -1,12 +1,11 @@
 package com.hermes.hermes.controller;
 
-import com.hermes.hermes.controller.dto.OrcamentoRequestDto;
-import com.hermes.hermes.controller.dto.OrcamentoResponseDto;
-import com.hermes.hermes.controller.dto.PecaRequestDto;
-import com.hermes.hermes.controller.dto.PecaResponseDto;
 import com.hermes.hermes.controller.dto.ReviewRequestDto;
-import com.hermes.hermes.domain.model.oficina.Orcamento;
-import com.hermes.hermes.domain.model.oficina.Peca;
+import com.hermes.hermes.controller.dto.orcamento.OrcamentoNovoRequestDto;
+import com.hermes.hermes.controller.dto.orcamento.OrcamentoNovoResponseDto;
+import com.hermes.hermes.domain.enums.StatusOrcamento;
+import com.hermes.hermes.domain.model.orcamento.ItemOrcamento;
+import com.hermes.hermes.domain.model.orcamento.Orcamento;
 import com.hermes.hermes.service.OrcamentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/orcamentos")
@@ -26,120 +24,82 @@ public class OrcamentoController {
 
     private final OrcamentoService orcamentoService;
 
-    @PostMapping
-    public ResponseEntity<OrcamentoResponseDto> criarOrcamento(@Valid @RequestBody OrcamentoRequestDto dto) {
-        log.info("Criando orçamento para sinistro {} e oficina {}", dto.getSinistroId(), dto.getOficinaId());
+    // ========== NOVOS ENDPOINTS (Nova Estrutura) ==========
 
-        Orcamento orcamento = mapDtoToEntity(dto);
-        Orcamento salvo = orcamentoService.salvar(orcamento, dto.getSinistroId(), dto.getOficinaId());
+    @PostMapping("/novo")
+    public ResponseEntity<OrcamentoNovoResponseDto> criarNovoOrcamento(@Valid @RequestBody OrcamentoNovoRequestDto dto) {
+        log.info("Criando novo orçamento para sinistro {} e prestador {}", dto.getSinistroId(), dto.getPrestadorId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapToResponseDto(salvo));
+        Orcamento orcamento = new Orcamento();
+        orcamento.setObservacoes(dto.getObservacoes());
+
+        Orcamento salvo = orcamentoService.salvar(orcamento, dto.getSinistroId(), dto.getPrestadorId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapToNovoResponseDto(salvo));
     }
 
-    @GetMapping("/sinistro/{sinistroId}")
-    public ResponseEntity<List<OrcamentoResponseDto>> listarPorSinistro(@PathVariable Long sinistroId) {
-        List<OrcamentoResponseDto> list = orcamentoService.listarPorSinistro(sinistroId).stream()
-                .map(this::mapToResponseDto)
+    @GetMapping("/novo/sinistro/{sinistroId}")
+    public ResponseEntity<List<OrcamentoNovoResponseDto>> listarNovosPorSinistro(@PathVariable Long sinistroId) {
+        List<OrcamentoNovoResponseDto> list = orcamentoService.listarPorSinistro(sinistroId).stream()
+                .map(this::mapToNovoResponseDto)
                 .toList();
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping
-    public ResponseEntity<List<OrcamentoResponseDto>> listarTodos() {
-        List<OrcamentoResponseDto> list = orcamentoService.listarTodos().stream()
-                .map(this::mapToResponseDto)
-                .toList();
-        return ResponseEntity.ok(list);
-    }
-
-    @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<List<OrcamentoResponseDto>> listarPorCliente(@PathVariable Long clienteId) {
-        List<OrcamentoResponseDto> list = orcamentoService.listarPorCliente(clienteId).stream()
-                .map(this::mapToResponseDto)
-                .toList();
-        return ResponseEntity.ok(list);
-    }
-
-    @PostMapping("/{id}/aceitar")
-    public ResponseEntity<OrcamentoResponseDto> aceitarOrcamento(@PathVariable Long id) {
+    @PutMapping("/{id}/aceitar")
+    public ResponseEntity<OrcamentoNovoResponseDto> aceitarOrcamento(@PathVariable Long id) {
         Orcamento atualizado = orcamentoService.aceitar(id);
-        return ResponseEntity.ok(mapToResponseDto(atualizado));
+        return ResponseEntity.ok(mapToNovoResponseDto(atualizado));
     }
 
-    @PostMapping("/{id}/revisar")
-    public ResponseEntity<OrcamentoResponseDto> revisarOrcamento(@PathVariable Long id,
-                                                                 @Valid @RequestBody ReviewRequestDto dto) {
+    @PutMapping("/{id}/revisar")
+    public ResponseEntity<OrcamentoNovoResponseDto> revisarOrcamento(
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewRequestDto dto) {
         Orcamento atualizado = orcamentoService.revisar(id, dto.getReviewNotes());
-        return ResponseEntity.ok(mapToResponseDto(atualizado));
+        return ResponseEntity.ok(mapToNovoResponseDto(atualizado));
     }
 
-    @GetMapping("/oficina/{oficinaId}")
-    public ResponseEntity<List<OrcamentoResponseDto>> listarPorOficina(@PathVariable Long oficinaId) {
-        List<OrcamentoResponseDto> list = orcamentoService.listarPorOficina(oficinaId).stream()
-                .map(this::mapToResponseDto)
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<OrcamentoNovoResponseDto>> listarPorStatus(@PathVariable String status) {
+        StatusOrcamento statusOrcamento = StatusOrcamento.valueOf(status.toUpperCase());
+        List<OrcamentoNovoResponseDto> list = orcamentoService.listarPorStatus(statusOrcamento).stream()
+                .map(this::mapToNovoResponseDto)
                 .toList();
         return ResponseEntity.ok(list);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<OrcamentoResponseDto> atualizar(@PathVariable Long id,
-                                               @Valid @RequestBody OrcamentoRequestDto dto) {
-        Orcamento dados = mapDtoToEntity(dto);
-        Orcamento atualizado = orcamentoService.atualizar(id, dados, dto.getSinistroId(), dto.getOficinaId());
-        return ResponseEntity.ok(mapToResponseDto(atualizado));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        orcamentoService.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    private Orcamento mapDtoToEntity(OrcamentoRequestDto dto) {
-        Orcamento o = new Orcamento();
-        o.setDescricao(dto.getDescricao());
-        o.setValorMaoDeObra(dto.getValorMaoDeObra());
-        o.setPrazo(dto.getPrazo());
-
-        if (dto.getPecas() != null) {
-            List<Peca> pecas = dto.getPecas().stream().map(this::mapPecaDtoToEntity).collect(Collectors.toList());
-            o.setPecas(pecas);
+    private OrcamentoNovoResponseDto mapToNovoResponseDto(Orcamento orcamento) {
+        List<OrcamentoNovoResponseDto.ItemOrcamentoResponseDto> itensDto = null;
+        if (orcamento.getItens() != null) {
+            itensDto = orcamento.getItens().stream()
+                    .map(this::mapItemToDto)
+                    .toList();
         }
 
-        return o;
+        return OrcamentoNovoResponseDto.builder()
+                .id(orcamento.getId())
+                .valorTotal(orcamento.getValorTotal())
+                .status(orcamento.getStatus())
+                .sinistroId(orcamento.getSinistro() != null ? orcamento.getSinistro().getId() : null)
+                .prestadorId(orcamento.getPrestador() != null ? orcamento.getPrestador().getId() : null)
+                .observacoes(orcamento.getObservacoes())
+                .dataCriacao(orcamento.getDataCriacao())
+                .dataAtualizacao(orcamento.getDataAtualizacao())
+                .itens(itensDto)
+                .build();
     }
 
-    private Peca mapPecaDtoToEntity(PecaRequestDto dto) {
-        Peca p = new Peca();
-        p.setId(dto.getId());
-        p.setNome(dto.getNome());
-        p.setValor(dto.getValor());
-        return p;
+    private OrcamentoNovoResponseDto.ItemOrcamentoResponseDto mapItemToDto(ItemOrcamento item) {
+        String tipo = item.getClass().getSimpleName().toUpperCase();
+        
+        return OrcamentoNovoResponseDto.ItemOrcamentoResponseDto.builder()
+                .id(item.getId())
+                .descricao(item.getDescricao())
+                .valor(item.getValor())
+                .quantidade(item.getQuantidade())
+                .subtotal(item.calcularSubtotal())
+                .tipo(tipo)
+                .build();
     }
 
-    private OrcamentoResponseDto mapToResponseDto(Orcamento o) {
-        OrcamentoResponseDto.OrcamentoResponseDtoBuilder b = OrcamentoResponseDto.builder()
-                .id(o.getId())
-                .descricao(o.getDescricao())
-                .valorPecas(o.getValorPecas())
-                .valorMaoDeObra(o.getValorMaoDeObra())
-                .prazo(o.getPrazo());
-
-        if (o.getSinistro() != null) b.sinistroId(o.getSinistro().getId());
-        if (o.getOficina() != null) b.oficinaId(o.getOficina().getId());
-
-        if (o.getPecas() != null) {
-            List<PecaResponseDto> pecas = o.getPecas().stream().map(p -> PecaResponseDto.builder()
-                    .id(p.getId())
-                    .nome(p.getNome())
-                    .valor(p.getValor())
-                    .build()).toList();
-            b.pecas(pecas);
-        }
-
-        if (o.getStatus() != null) b.status(o.getStatus().name());
-        b.reviewNotes(o.getReviewNotes());
-
-        return b.build();
-    }
 }

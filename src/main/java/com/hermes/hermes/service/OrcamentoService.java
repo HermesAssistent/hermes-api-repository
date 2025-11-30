@@ -1,9 +1,11 @@
 package com.hermes.hermes.service;
 
-import com.hermes.hermes.domain.model.oficina.Orcamento;
-import com.hermes.hermes.domain.model.oficina.Peca;
+import com.hermes.hermes.domain.enums.StatusOrcamento;
+import com.hermes.hermes.domain.model.orcamento.ItemOrcamento;
+import com.hermes.hermes.domain.model.orcamento.Orcamento;
 import com.hermes.hermes.domain.model.oficina.Oficina;
 import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.strategy.OrcamentoStrategy;
 import com.hermes.hermes.exception.NotFoundException;
 import com.hermes.hermes.repository.OrcamentoRepository;
 import com.hermes.hermes.repository.OficinaRepository;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -26,120 +29,193 @@ public class OrcamentoService {
 
     @Autowired
     private OficinaRepository oficinaRepository;
+    
+    @Autowired
+    private List<OrcamentoStrategy> strategies;
 
-    public Orcamento salvar(Orcamento orcamento, Long sinistroId, Long oficinaId) {
-        if (sinistroId != null) {
-            Sinistro s = sinistroRepository.findById(sinistroId)
-                    .orElseThrow(() -> new NotFoundException("Sinistro não encontrado"));
-            orcamento.setSinistro(s);
+    /**
+     * Salva um orçamento no sistema.
+     */
+    public Orcamento salvar(Orcamento orcamento, Long sinistroId, Long prestadorId) {
+        // Busca o sinistro
+        Sinistro sinistro = sinistroRepository.findById(sinistroId)
+                .orElseThrow(() -> new NotFoundException("Sinistro não encontrado"));
+        orcamento.setSinistro(sinistro);
+
+        // Busca o prestador se informado
+        if (prestadorId != null) {
+            Oficina prestador = oficinaRepository.findById(prestadorId)
+                    .orElseThrow(() -> new NotFoundException("Prestador não encontrado"));
+            orcamento.setPrestador(prestador);
         }
 
-        if (oficinaId != null) {
-            Oficina o = oficinaRepository.findById(oficinaId)
-                    .orElseThrow(() -> new NotFoundException("Oficina não encontrada"));
-            orcamento.setOficina(o);
-        }
-
-        if (orcamento.getPecas() != null) {
-            for (Peca p : orcamento.getPecas()) {
-                p.setOrcamento(orcamento);
+        // Se não há itens, gera automaticamente usando strategy
+        if (orcamento.getItens() == null || orcamento.getItens().isEmpty()) {
+            List<ItemOrcamento> itensGerados = criarItensOrcamento(sinistro);
+            for (ItemOrcamento item : itensGerados) {
+                orcamento.adicionarItem(item);
+            }
+        } else {
+            // Associa itens existentes ao orçamento
+            for (ItemOrcamento item : orcamento.getItens()) {
+                item.setOrcamento(orcamento);
             }
         }
 
-        orcamento.atualizarValorPecasAPartirDasPecas();
+        // Calcula valor total
+        orcamento.calcularTotal();
 
         return orcamentoRepository.save(orcamento);
     }
 
+    /**
+     * Lista orçamentos por sinistro.
+     */
     public List<Orcamento> listarPorSinistro(Long sinistroId) {
         return orcamentoRepository.findBySinistroId(sinistroId);
     }
 
-    public List<Orcamento> listarPorOficina(Long oficinaId) {
-        return orcamentoRepository.findByOficinaId(oficinaId);
+    /**
+     * Lista orçamentos por prestador.
+     */
+    public List<Orcamento> listarPorPrestador(Long prestadorId) {
+        return orcamentoRepository.findByPrestadorId(prestadorId);
     }
 
+    /**
+     * Lista todos os orçamentos.
+     */
     public List<Orcamento> listarTodos() {
         return orcamentoRepository.findAll();
     }
 
+    /**
+     * Lista orçamentos por cliente.
+     */
     public List<Orcamento> listarPorCliente(Long clienteId) {
         return orcamentoRepository.findBySinistroClienteId(clienteId);
     }
 
+    /**
+     * Aceita um orçamento.
+     */
     public Orcamento aceitar(Long id) {
-        Orcamento existente = orcamentoRepository.findById(id)
-                .orElseThrow(() -> new com.hermes.hermes.exception.NotFoundException("Orçamento não encontrado"));
-        existente.setStatus(com.hermes.hermes.domain.model.oficina.OrcamentoStatus.ACCEPTED);
-        return orcamentoRepository.save(existente);
+        Orcamento orcamento = buscarPorId(id);
+        orcamento.aceitar();
+        return orcamentoRepository.save(orcamento);
     }
 
-    public Orcamento revisar(Long id, String reviewNotes) {
-        Orcamento existente = orcamentoRepository.findById(id)
-                .orElseThrow(() -> new com.hermes.hermes.exception.NotFoundException("Orçamento não encontrado"));
-        existente.setStatus(com.hermes.hermes.domain.model.oficina.OrcamentoStatus.UNDER_REVIEW);
-        existente.setReviewNotes(reviewNotes);
-        return orcamentoRepository.save(existente);
+    /**
+     * Revisa um orçamento com observações.
+     */
+    public Orcamento revisar(Long id, String observacoes) {
+        Orcamento orcamento = buscarPorId(id);
+        orcamento.revisar(observacoes);
+        return orcamentoRepository.save(orcamento);
     }
 
-    public Orcamento atualizar(Long id, Orcamento dados, Long sinistroId, Long oficinaId) {
-        Orcamento existente = orcamentoRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Orçamento não encontrado"));
-
-        
-        existente.setDescricao(dados.getDescricao());
-        existente.setValorMaoDeObra(dados.getValorMaoDeObra());
-        existente.setPrazo(dados.getPrazo());
-
-        if (sinistroId != null) {
-            Sinistro s = sinistroRepository.findById(sinistroId)
-                    .orElseThrow(() -> new NotFoundException("Sinistro não encontrado"));
-            existente.setSinistro(s);
-        }
-
-        if (oficinaId != null) {
-            Oficina o = oficinaRepository.findById(oficinaId)
-                    .orElseThrow(() -> new NotFoundException("Oficina não encontrada"));
-            existente.setOficina(o);
-        }
-
-        if (dados.getPecas() != null) {
-            java.util.Map<Long, Peca> mapaExistentes = new java.util.HashMap<>();
-            for (Peca p : existente.getPecas()) {
-                if (p.getId() != null) {
-                    mapaExistentes.put(p.getId(), p);
-                }
-            }
-
-            java.util.List<Peca> resultado = new java.util.ArrayList<>();
-
-            for (Peca p : dados.getPecas()) {
-                if (p.getId() != null) {
-                    Peca encontrada = mapaExistentes.get(p.getId());
-                    if (encontrada == null) {
-                        throw new NotFoundException("Peça não encontrada no orçamento: id=" + p.getId());
-                    }
-                    encontrada.setNome(p.getNome());
-                    encontrada.setValor(p.getValor());
-                    encontrada.setOrcamento(existente);
-                    resultado.add(encontrada);
-                    mapaExistentes.remove(p.getId());
-                } else {
-                    p.setOrcamento(existente);
-                    resultado.add(p);
-                }
-            }
-            existente.getPecas().clear();
-            existente.getPecas().addAll(resultado);
-        }
-
-        existente.atualizarValorPecasAPartirDasPecas();
-        return orcamentoRepository.save(existente);
+    /**
+     * Rejeita um orçamento.
+     */
+    public Orcamento rejeitar(Long id, String motivo) {
+        Orcamento orcamento = buscarPorId(id);
+        orcamento.rejeitar(motivo);
+        return orcamentoRepository.save(orcamento);
     }
 
+    /**
+     * Calcula valor total de um orçamento.
+     */
+    public BigDecimal calcularValorTotal(Orcamento orcamento) {
+        return orcamento.calcularTotal();
+    }
+
+    /**
+     * Atualiza um orçamento existente.
+     */
+    public Orcamento atualizar(Long id, Orcamento dadosAtualizacao, Long sinistroId, Long prestadorId) {
+        Orcamento orcamentoExistente = buscarPorId(id);
+
+        // Atualiza observações
+        if (dadosAtualizacao.getObservacoes() != null) {
+            orcamentoExistente.setObservacoes(dadosAtualizacao.getObservacoes());
+        }
+
+        // Atualiza prestador se informado
+        if (prestadorId != null) {
+            Oficina prestador = oficinaRepository.findById(prestadorId)
+                    .orElseThrow(() -> new NotFoundException("Prestador não encontrado"));
+            orcamentoExistente.setPrestador(prestador);
+        }
+
+        // Recalcula total
+        orcamentoExistente.calcularTotal();
+
+        return orcamentoRepository.save(orcamentoExistente);
+    }
+
+    /**
+     * Deleta um orçamento.
+     */
     public void deletar(Long id) {
-        Orcamento existente = orcamentoRepository.findById(id)
+        Orcamento orcamento = buscarPorId(id);
+        orcamentoRepository.delete(orcamento);
+    }
+
+    /**
+     * Lista orçamentos por status.
+     */
+    public List<Orcamento> listarPorStatus(StatusOrcamento status) {
+        return orcamentoRepository.findByStatus(status);
+    }
+
+    /**
+     * Busca orçamento por ID.
+     */
+    private Orcamento buscarPorId(Long id) {
+        return orcamentoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Orçamento não encontrado"));
-        orcamentoRepository.delete(existente);
+    }
+
+    /**
+     * Cria itens de orçamento usando Strategy pattern.
+     */
+    private List<ItemOrcamento> criarItensOrcamento(Sinistro sinistro) {
+        String tipoSinistro = determinarTipoSinistro(sinistro);
+        
+        OrcamentoStrategy strategy = strategies.stream()
+                .filter(s -> s.suportaTipo(tipoSinistro))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Estratégia não encontrada para tipo: " + tipoSinistro));
+
+        return strategy.criarItensOrcamento(sinistro);
+    }
+
+    /**
+     * Determina o tipo de sinistro baseado nas informações disponíveis.
+     */
+    private String determinarTipoSinistro(Sinistro sinistro) {
+        // Lógica para determinar tipo baseado no sinistro
+        String problema = sinistro.getProblema() != null ? sinistro.getProblema().toLowerCase() : "";
+        String categoria = sinistro.getCategoriaProblema() != null ? sinistro.getCategoriaProblema().toLowerCase() : "";
+
+        if (problema.contains("veiculo") || problema.contains("colisao") || categoria.contains("automotivo")) {
+            return "AUTOMOTIVO";
+        } else if (problema.contains("casa") || problema.contains("vazamento") || categoria.contains("domestico")) {
+            return "DOMESTICO";
+        } else if (problema.contains("carga") || problema.contains("transporte") || categoria.contains("transporte")) {
+            return "TRANSPORTE";
+        }
+
+        // Default para automotivo se não conseguir determinar
+        return "AUTOMOTIVO";
+    }
+
+    /**
+     * Métodos para compatibilidade com estrutura anterior
+     */
+    @Deprecated
+    public List<Orcamento> listarPorOficina(Long oficinaId) {
+        return listarPorPrestador(oficinaId);
     }
 }
