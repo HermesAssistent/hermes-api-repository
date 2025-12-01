@@ -25,7 +25,7 @@ public interface OrcamentoRepository extends JpaRepository<Orcamento, Long> {
     /**
      * Busca orçamentos por cliente através do sinistro.
      */
-    @Query("SELECT o FROM Orcamento o WHERE o.sinistro.cliente.id = :clienteId")
+    @Query("SELECT o FROM OrcamentoOficina o WHERE o.sinistro.cliente.id = :clienteId")
     List<Orcamento> findBySinistroClienteId(@Param("clienteId") Long clienteId);
     
     /**

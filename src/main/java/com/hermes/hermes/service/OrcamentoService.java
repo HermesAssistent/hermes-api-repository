@@ -4,13 +4,12 @@ import com.hermes.hermes.domain.enums.StatusOrcamento;
 import com.hermes.hermes.domain.model.orcamento.ItemOrcamento;
 import com.hermes.hermes.domain.model.orcamento.Orcamento;
 import com.hermes.hermes.domain.model.oficina.Oficina;
-import com.hermes.hermes.domain.model.sinistro.SinistroAutomotivo;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroBase;
 import com.hermes.hermes.domain.strategy.OrcamentoStrategy;
 import com.hermes.hermes.exception.NotFoundException;
 import com.hermes.hermes.repository.OrcamentoRepository;
 import com.hermes.hermes.repository.OficinaRepository;
-import com.hermes.hermes.repository.sinistro.SinistroAutomotivoRepository;
+import com.hermes.hermes.service.sinistro.SinistroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,21 +25,20 @@ public class OrcamentoService {
     private OrcamentoRepository orcamentoRepository;
 
     @Autowired
-    private SinistroAutomotivoRepository sinistroRepository;
-
-    @Autowired
     private OficinaRepository oficinaRepository;
 
     @Autowired
     private List<OrcamentoStrategy> strategies;
 
+    @Autowired
+    private SinistroService sinistroService;
+
     /**
      * Salva um orçamento no sistema.
      */
-    public Orcamento salvar(Orcamento orcamento, Long sinistroId, Long prestadorId) {
+    public Orcamento salvar(Orcamento orcamento, Long sinistroId, Long prestadorId, String tipoSinistro) {
         // Busca o sinistro
-        Sinistro sinistro = sinistroRepository.findById(sinistroId)
-                .orElseThrow(() -> new NotFoundException("Sinistro não encontrado"));
+        SinistroBase sinistro = sinistroService.buscarPorId(sinistroId, tipoSinistro);
         orcamento.setSinistro(sinistro);
 
         // Busca o prestador se informado
@@ -181,7 +179,7 @@ public class OrcamentoService {
     /**
      * Cria itens de orçamento usando Strategy pattern.
      */
-    private List<ItemOrcamento> criarItensOrcamento(Sinistro sinistro) {
+    private List<ItemOrcamento> criarItensOrcamento(SinistroBase sinistro) {
         String tipoSinistro = determinarTipoSinistro(sinistro);
 
         OrcamentoStrategy strategy = strategies.stream()
@@ -195,7 +193,7 @@ public class OrcamentoService {
     /**
      * Determina o tipo de sinistro baseado nas informações disponíveis.
      */
-    private String determinarTipoSinistro(Sinistro sinistro) {
+    private String determinarTipoSinistro(SinistroBase sinistro) {
         // Lógica para determinar tipo baseado no sinistro
         String problema = sinistro.getProblema() != null ? sinistro.getProblema().toLowerCase() : "";
         String categoria = sinistro.getCategoriaProblema() != null ? sinistro.getCategoriaProblema().toLowerCase() : "";

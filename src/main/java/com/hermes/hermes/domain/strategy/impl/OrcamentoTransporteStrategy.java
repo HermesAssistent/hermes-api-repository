@@ -6,7 +6,7 @@ import com.hermes.hermes.domain.model.orcamento.ItemOrcamento;
 import com.hermes.hermes.domain.model.orcamento.transporte.CustoLogistico;
 import com.hermes.hermes.domain.model.orcamento.transporte.CustoPericial;
 import com.hermes.hermes.domain.model.orcamento.transporte.CustoReposicao;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroBase;
 import com.hermes.hermes.domain.strategy.OrcamentoStrategy;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ import java.util.List;
 public class OrcamentoTransporteStrategy implements OrcamentoStrategy {
     
     @Override
-    public BigDecimal calcularCustos(Sinistro sinistro) {
+    public BigDecimal calcularCustos(SinistroBase sinistro) {
         List<ItemOrcamento> itens = criarItensOrcamento(sinistro);
         return itens.stream()
                 .map(ItemOrcamento::calcularSubtotal)
@@ -26,7 +26,7 @@ public class OrcamentoTransporteStrategy implements OrcamentoStrategy {
     }
     
     @Override
-    public List<ItemOrcamento> criarItensOrcamento(Sinistro sinistro) {
+    public List<ItemOrcamento> criarItensOrcamento(SinistroBase sinistro) {
         List<ItemOrcamento> itens = new ArrayList<>();
         
         // Custo pericial obrigatório
@@ -53,13 +53,13 @@ public class OrcamentoTransporteStrategy implements OrcamentoStrategy {
     }
     
     
-    private boolean temAvariaCarga(Sinistro sinistro) {
+    private boolean temAvariaCarga(SinistroBase sinistro) {
         String problema = sinistro.getProblema() != null ? sinistro.getProblema().toLowerCase() : "";
         return problema.contains("avaria") || problema.contains("perda") || problema.contains("dano");
     }
     
     
-    private CustoPericial criarCustoPericial(Sinistro sinistro) {
+    private CustoPericial criarCustoPericial(SinistroBase sinistro) {
         CustoPericial custo = new CustoPericial();
         custo.setDescricao("Perícia de transporte");
         custo.setTipoAvaliacao(TipoAvaliacao.COMPLETA);
@@ -72,7 +72,7 @@ public class OrcamentoTransporteStrategy implements OrcamentoStrategy {
     }
     
     
-    private CustoReposicao criarCustoReposicao(Sinistro sinistro) {
+    private CustoReposicao criarCustoReposicao(SinistroBase sinistro) {
         CustoReposicao custo = new CustoReposicao();
         custo.setDescricao("Reposição de carga avariada");
         custo.setValorCarga(new BigDecimal("50000.00")); // Valor exemplo
@@ -84,7 +84,7 @@ public class OrcamentoTransporteStrategy implements OrcamentoStrategy {
     }
     
     
-    private List<CustoLogistico> criarCustosLogisticos(Sinistro sinistro) {
+    private List<CustoLogistico> criarCustosLogisticos(SinistroBase sinistro) {
         List<CustoLogistico> custos = new ArrayList<>();
         
         // Custo de armazenagem
@@ -113,7 +113,7 @@ public class OrcamentoTransporteStrategy implements OrcamentoStrategy {
     }
     
     
-    private boolean temTransbordo(Sinistro sinistro) {
+    private boolean temTransbordo(SinistroBase sinistro) {
         String problema = sinistro.getProblema() != null ? sinistro.getProblema().toLowerCase() : "";
         return problema.contains("transbordo") || problema.contains("transferencia") || 
                problema.contains("acidente");

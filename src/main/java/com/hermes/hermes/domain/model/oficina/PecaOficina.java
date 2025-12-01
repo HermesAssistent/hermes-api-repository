@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Peca extends Entidade {
+public class PecaOficina extends Entidade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pec_peca_seq")
@@ -30,7 +30,7 @@ public class Peca extends Entidade {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orcamento_id")
     @JsonIgnore
-    private Orcamento orcamento;
+    private OrcamentoOficina orcamento;
 
     @Override
     public Long getId() {

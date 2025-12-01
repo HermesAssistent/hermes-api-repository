@@ -10,11 +10,13 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-@MappedSuperclass
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "item_orcamento")
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class ItemOrcamento extends Entidade {
     
     @Id

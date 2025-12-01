@@ -25,6 +25,7 @@ public abstract class SinistroBase extends Entidade {
     private String problema;
     private String data;
     private String hora;
+    private String categoriaProblema;
 
     @OneToMany(mappedBy = "sinistro", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Foto> fotos;

@@ -33,7 +33,9 @@ public class OrcamentoController {
         Orcamento orcamento = new Orcamento();
         orcamento.setObservacoes(dto.getObservacoes());
 
-        Orcamento salvo = orcamentoService.salvar(orcamento, dto.getSinistroId(), dto.getPrestadorId());
+        String tipoSinistro = dto.getTipoSinistro();
+
+        Orcamento salvo = orcamentoService.salvar(orcamento, dto.getSinistroId(), dto.getPrestadorId(), tipoSinistro);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapToNovoResponseDto(salvo));
     }
 

@@ -34,7 +34,6 @@ public class SinistroAutomotivo extends SinistroBase {
     private String testemunhas;
     private String autoridadesAcionadas;
     private String veiculoImobilizado;
-    private String categoriaProblema;
 
     @Embedded
     private Localizacao localizacao;
@@ -134,7 +133,7 @@ public class SinistroAutomotivo extends SinistroBase {
                 ", testemunhas='" + testemunhas + '\'' +
                 ", autoridadesAcionadas='" + autoridadesAcionadas + '\'' +
                 ", veiculoImobilizado='" + veiculoImobilizado + '\'' +
-                ", categoriaProblema='" + categoriaProblema + '\'' +
+                ", categoriaProblema='" + getCategoriaProblema() + '\'' +
                 '}';
     }
 

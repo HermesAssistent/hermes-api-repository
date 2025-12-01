@@ -2,8 +2,8 @@ package com.hermes.hermes.domain.model.orcamento;
 
 import com.hermes.hermes.domain.model.abstracts.Entidade;
 import com.hermes.hermes.domain.model.prestador.Prestador;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
 import com.hermes.hermes.domain.enums.StatusOrcamento;
+import com.hermes.hermes.domain.model.sinistro.SinistroBase;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "orcamento")
+@Table(name = "orcamentos")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
@@ -48,7 +48,7 @@ public class Orcamento extends Entidade {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sinistro_id", nullable = false)
-    private Sinistro sinistro;
+    private SinistroBase sinistro;
     
     @Column(length = 1000)
     private String observacoes;

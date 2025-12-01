@@ -14,11 +14,13 @@ import java.util.List;
  * Classe abstrata que representa um prestador de serviços no sistema.
  * Define a estrutura comum para diferentes tipos de prestadores.
  */
-@MappedSuperclass
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "prestadores")
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Prestador extends Entidade {
     
     @Id

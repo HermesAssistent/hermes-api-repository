@@ -4,7 +4,7 @@ import com.hermes.hermes.domain.enums.NivelUrgencia;
 import com.hermes.hermes.domain.model.orcamento.ItemOrcamento;
 import com.hermes.hermes.domain.model.orcamento.domestico.Material;
 import com.hermes.hermes.domain.model.orcamento.domestico.ServicoTecnico;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroBase;
 import com.hermes.hermes.domain.strategy.OrcamentoStrategy;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class OrcamentoDomesticoStrategy implements OrcamentoStrategy {
     
     @Override
-    public BigDecimal calcularCustos(Sinistro sinistro) {
+    public BigDecimal calcularCustos(SinistroBase sinistro) {
         List<ItemOrcamento> itens = criarItensOrcamento(sinistro);
         
         BigDecimal custoBase = itens.stream()
@@ -28,7 +28,7 @@ public class OrcamentoDomesticoStrategy implements OrcamentoStrategy {
     }
     
     @Override
-    public List<ItemOrcamento> criarItensOrcamento(Sinistro sinistro) {
+    public List<ItemOrcamento> criarItensOrcamento(SinistroBase sinistro) {
         List<ItemOrcamento> itens = new ArrayList<>();
         
         // Adiciona materiais básicos
@@ -61,7 +61,7 @@ public class OrcamentoDomesticoStrategy implements OrcamentoStrategy {
     }
     
     
-    private NivelUrgencia determinarUrgencia(Sinistro sinistro) {
+    private NivelUrgencia determinarUrgencia(SinistroBase sinistro) {
         String problema = sinistro.getProblema() != null ? sinistro.getProblema().toLowerCase() : "";
         
         if (problema.contains("emergencia") || problema.contains("urgente") || 
@@ -75,7 +75,7 @@ public class OrcamentoDomesticoStrategy implements OrcamentoStrategy {
     }
     
     
-    private List<Material> criarMateriaisBasicos(Sinistro sinistro) {
+    private List<Material> criarMateriaisBasicos(SinistroBase sinistro) {
         List<Material> materiais = new ArrayList<>();
         
         // Material exemplo
@@ -93,7 +93,7 @@ public class OrcamentoDomesticoStrategy implements OrcamentoStrategy {
     }
     
     
-    private List<ServicoTecnico> criarServicosTecnicos(Sinistro sinistro) {
+    private List<ServicoTecnico> criarServicosTecnicos(SinistroBase sinistro) {
         List<ServicoTecnico> servicos = new ArrayList<>();
         
         // Serviço exemplo

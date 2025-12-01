@@ -3,7 +3,7 @@ package com.hermes.hermes.domain.strategy.impl;
 import com.hermes.hermes.domain.model.orcamento.ItemOrcamento;
 import com.hermes.hermes.domain.model.orcamento.automotivo.MaoDeObra;
 import com.hermes.hermes.domain.model.orcamento.automotivo.Peca;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroBase;
 import com.hermes.hermes.domain.strategy.OrcamentoStrategy;
 import org.springframework.stereotype.Component;
 
@@ -15,15 +15,15 @@ import java.util.List;
 public class OrcamentoAutomotivoStrategy implements OrcamentoStrategy {
     
     @Override
-    public BigDecimal calcularCustos(Sinistro sinistro) {
+    public BigDecimal calcularCustos(SinistroBase sinistro) {
         List<ItemOrcamento> itens = criarItensOrcamento(sinistro);
         return itens.stream()
                 .map(ItemOrcamento::calcularSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-    
+
     @Override
-    public List<ItemOrcamento> criarItensOrcamento(Sinistro sinistro) {
+    public List<ItemOrcamento> criarItensOrcamento(SinistroBase sinistro) {
         List<ItemOrcamento> itens = new ArrayList<>();
         
         // Adiciona peças básicas
@@ -44,7 +44,7 @@ public class OrcamentoAutomotivoStrategy implements OrcamentoStrategy {
     }
     
     
-    private List<Peca> criarPecasBasicas(Sinistro sinistro) {
+    private List<Peca> criarPecasBasicas(SinistroBase sinistro) {
         List<Peca> pecas = new ArrayList<>();
         
         // Peça exemplo
@@ -61,7 +61,7 @@ public class OrcamentoAutomotivoStrategy implements OrcamentoStrategy {
     }
     
     
-    private List<MaoDeObra> criarMaoDeObraBasica(Sinistro sinistro) {
+    private List<MaoDeObra> criarMaoDeObraBasica(SinistroBase sinistro) {
         List<MaoDeObra> servicos = new ArrayList<>();
         
         // Serviço exemplo

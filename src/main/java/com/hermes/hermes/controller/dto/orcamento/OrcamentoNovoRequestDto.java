@@ -23,4 +23,6 @@ public class OrcamentoNovoRequestDto {
 
     @Builder.Default
     private Boolean gerarItensAutomaticamente = true;
+
+    private String tipoSinistro;
 }
