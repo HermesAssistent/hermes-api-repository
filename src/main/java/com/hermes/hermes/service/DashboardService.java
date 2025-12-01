@@ -6,7 +6,7 @@ import com.hermes.hermes.exception.InvalidResourceStateException;
 import com.hermes.hermes.repository.ClienteRepository;
 import com.hermes.hermes.repository.OficinaRepository;
 import com.hermes.hermes.repository.SeguradoraRepository;
-import com.hermes.hermes.repository.SinistroRepository;
+import com.hermes.hermes.repository.sinistro.SinistroAutomotivoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class DashboardService {
 
     private final ClienteRepository clienteRepository;
-    private final SinistroRepository sinistroRepository;
+    private final SinistroAutomotivoRepository sinistroRepository;
     private final OficinaRepository oficinaRepository;
     private final SeguradoraRepository seguradoraRepository;
 

@@ -1,9 +1,10 @@
 package com.hermes.hermes.service;
 
 import com.hermes.hermes.controller.dto.FotoDto;
-import com.hermes.hermes.controller.dto.SinistroDto;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.controller.dto.sinistro.SinistroAutomotivoDto;
+import com.hermes.hermes.domain.model.sinistro.SinistroAutomotivo;
 import com.hermes.hermes.exception.FileStorageException;
+import com.hermes.hermes.service.sinistro.SinistroService;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +29,12 @@ import java.util.List;
 public class RelatorioService {
     private final SinistroService sinistroService;
 
-    public byte[] gerarPdf(Long sinistroId) {
+    public byte[] gerarPdf(Long sinistroId, String tipoSinistro) {
 
-        Sinistro sinistro = sinistroService.buscarPorId(sinistroId);
+        SinistroAutomotivo sinistro = (SinistroAutomotivo) sinistroService.buscarPorId(sinistroId, tipoSinistro);
 
         // Buscar o sinistro pelo ID
-        SinistroDto sinistroDto =  SinistroDto.fromEntity(sinistro);
+        SinistroAutomotivoDto sinistroDto =  SinistroAutomotivoDto.fromEntity(sinistro);
 
         // Ler o template HTML
         String html;
@@ -72,7 +73,7 @@ public class RelatorioService {
         }
     }
 
-    private String preencherTemplate(String html, SinistroDto sinistro) {
+    private String preencherTemplate(String html, SinistroAutomotivoDto sinistro) {
         // Data de emissão do relatório
         String dataEmissao = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 

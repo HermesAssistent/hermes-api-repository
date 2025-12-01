@@ -1,7 +1,7 @@
 package com.hermes.hermes.domain.model.oficina;
 
 import com.hermes.hermes.domain.model.abstracts.Entidade;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroAutomotivo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Orcamento extends Entidade {
+public class OrcamentoOficina extends Entidade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orc_orcamento_seq")
@@ -37,11 +37,11 @@ public class Orcamento extends Entidade {
     private LocalDate prazo;
 
     @OneToMany(mappedBy = "orcamento", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Peca> pecas = new ArrayList<>();
+    private List<PecaOficina> pecas = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sinistro_id")
-    private Sinistro sinistro;
+    private SinistroAutomotivo sinistro;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "oficina_id")
@@ -66,7 +66,7 @@ public class Orcamento extends Entidade {
     public void atualizarValorPecasAPartirDasPecas() {
         java.math.BigDecimal total = java.math.BigDecimal.ZERO;
         if (this.pecas != null) {
-            for (Peca p : this.pecas) {
+            for (PecaOficina p : this.pecas) {
                 if (p != null && p.getValor() != null) {
                     total = total.add(p.getValor());
                 }

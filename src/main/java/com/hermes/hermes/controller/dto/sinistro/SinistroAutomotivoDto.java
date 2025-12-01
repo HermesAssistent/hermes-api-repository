@@ -1,6 +1,7 @@
-package com.hermes.hermes.controller.dto;
+package com.hermes.hermes.controller.dto.sinistro;
 
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.controller.dto.FotoDto;
+import com.hermes.hermes.domain.model.sinistro.SinistroAutomotivo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SinistroDto {
+public class SinistroAutomotivoDto implements SinistroBaseDto {
     private Long id;
     private String problema;
     private String local;
@@ -37,7 +38,7 @@ public class SinistroDto {
 
     private List<FotoDto> fotos;
 
-    public static SinistroDto fromEntity(Sinistro entity) {
+    public static SinistroAutomotivoDto fromEntity(SinistroAutomotivo entity) {
         if (entity == null) {
             return null;
         }
@@ -52,7 +53,7 @@ public class SinistroDto {
                     return fotoDto;
                 })
                 .toList();
-        return SinistroDto.builder()
+        return SinistroAutomotivoDto.builder()
                 .id(entity.getId())
                 .problema(entity.getProblema())
                 .local(entity.getLocalizacao() != null ? entity.getLocalizacao().getEndereco() : null)

@@ -1,5 +1,6 @@
 package com.hermes.hermes.service;
 
+import com.hermes.hermes.domain.model.sinistro.SinistroAutomotivo;
 import com.hermes.hermes.exception.LLMGenerationException;
 import com.hermes.hermes.exception.SQLExecutionException;
 import io.github.ollama4j.OllamaAPI;
@@ -358,7 +359,7 @@ public class LLMQueryService {
         public String gerarContextoSchemaCompleto() {
             List<Class<?>> entidades = List.of(
                     com.hermes.hermes.domain.model.cliente.Cliente.class,
-                    com.hermes.hermes.domain.model.sinistro.Sinistro.class,
+                    SinistroAutomotivo.class,
                     com.hermes.hermes.domain.model.oficina.Oficina.class,
                     com.hermes.hermes.domain.model.seguradora.Seguradora.class,
                     com.hermes.hermes.domain.model.usuario.Usuario.class,

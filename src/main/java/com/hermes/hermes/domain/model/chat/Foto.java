@@ -2,7 +2,7 @@ package com.hermes.hermes.domain.model.chat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hermes.hermes.domain.model.abstracts.Entidade;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroBase;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,5 +31,5 @@ public class Foto extends Entidade {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sinistro_id")
     @JsonIgnore
-    private Sinistro sinistro;
+    private SinistroBase sinistro;
 }

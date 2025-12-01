@@ -2,7 +2,7 @@ package com.hermes.hermes.service;
 
 import com.hermes.hermes.domain.model.chat.ChatSession;
 import com.hermes.hermes.domain.model.chat.Foto;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroBase;
 import com.hermes.hermes.exception.BusinessException;
 import com.hermes.hermes.exception.FileStorageException;
 import com.hermes.hermes.repository.FotoRepository;
@@ -26,7 +26,7 @@ public class FotoService {
 
     private static final String UPLOAD_DIR = "uploads/fotos";
 
-    public Foto salvarFoto(MultipartFile arquivo, ChatSession session, Sinistro sinistro) {
+    public Foto salvarFoto(MultipartFile arquivo, ChatSession session, SinistroBase sinistro) {
         if (arquivo == null || arquivo.isEmpty()) {
             throw new BusinessException("Arquivo vazio");
         }
@@ -53,7 +53,7 @@ public class FotoService {
         }
     }
 
-    public void relacionarSinistro(ChatSession session, Sinistro sinistro) {
+    public void relacionarSinistro(ChatSession session, SinistroBase sinistro) {
         List<Foto> fotos = fotoRepository.findAllByChatSession(session);
         for (Foto foto : fotos) {
             foto.setSinistro(sinistro);

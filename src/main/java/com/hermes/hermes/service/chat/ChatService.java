@@ -2,16 +2,16 @@ package com.hermes.hermes.service.chat;
 import com.hermes.hermes.domain.model.chat.ChatMessage;
 import com.hermes.hermes.domain.model.chat.ChatSession;
 import com.hermes.hermes.domain.model.cliente.Cliente;
-import com.hermes.hermes.domain.model.sinistro.Sinistro;
+import com.hermes.hermes.domain.model.sinistro.SinistroBase;
 import com.hermes.hermes.exception.ExternalServiceException;
 import com.hermes.hermes.exception.InvalidResourceStateException;
 import com.hermes.hermes.exception.NotFoundException;
 import com.hermes.hermes.repository.ChatMessageRepository;
 import com.hermes.hermes.repository.ChatSessionRepository;
-import com.hermes.hermes.repository.SinistroRepository;
+import com.hermes.hermes.repository.sinistro.SinistroRepository;
 import com.hermes.hermes.service.FotoService;
-import com.hermes.hermes.service.GeocodingService;
 import com.hermes.hermes.service.cliente.ClienteService;
+import com.hermes.hermes.service.sinistro.SinistroService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +35,13 @@ public class ChatService {
     private SinistroRepository sinistroRepository;
     private final FotoService fotoService;
     private final ClienteService clienteService;
-    private final GeocodingService geocodingService;
+    private final SinistroService sinistroService;
 
     @Autowired
     public ChatService(WebClient.Builder builder,
                        ChatSessionRepository sessionRepository,
                        ChatMessageRepository messageRepository,
-                       ChatMessageRepository chatMessageRepository, SinistroRepository sinistroRepository, FotoService fotoService, ClienteService clienteService, GeocodingService geocodingService) {
+                       ChatMessageRepository chatMessageRepository, SinistroRepository sinistroRepository, FotoService fotoService, ClienteService clienteService, SinistroService sinistroService) {
         this.webClient = builder.baseUrl("http://localhost:8000").build();
         this.sessionRepository = sessionRepository;
         this.messageRepository = messageRepository;
@@ -49,7 +49,7 @@ public class ChatService {
         this.sinistroRepository = sinistroRepository;
         this.fotoService = fotoService;
         this.clienteService = clienteService;
-        this.geocodingService = geocodingService;
+        this.sinistroService = sinistroService;
     }
 
     public Map<String, Object> iniciarChat(Long userId) {
@@ -136,13 +136,16 @@ public class ChatService {
         assert respostaExterna != null;
 
         if (Boolean.TRUE.equals(respostaExterna.get("conversa_finalizada"))) {
-          Sinistro sinistro = Sinistro.fromMap((LinkedHashMap<String, Object>) respostaExterna.get("resultado"),
-                  geocodingService);
-          Cliente cliente = clienteService.findByUsuarioId(userId);
-          sinistro.setCliente(cliente);
-          sinistroRepository.save(sinistro);
-          fotoService.relacionarSinistro(session, sinistro);
-          this.limparSessao(userId);
+            Map<String, Object> resultado = (Map<String, Object>) respostaExterna.get("resultado");
+
+            String tipoSinistro = (String) resultado.get("tipo");
+
+            SinistroBase sinistro = sinistroService.criar(tipoSinistro, resultado);
+            Cliente cliente = clienteService.findByUsuarioId(userId);
+            sinistro.setCliente(cliente);
+            sinistroRepository.save(sinistro);
+            fotoService.relacionarSinistro(session, sinistro);
+            this.limparSessao(userId);
         }
 
         return Map.of(
