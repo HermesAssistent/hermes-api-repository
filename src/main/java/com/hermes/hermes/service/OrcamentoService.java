@@ -210,11 +210,5 @@ public class OrcamentoService {
         return "AUTOMOTIVO";
     }
 
-    /**
-     * Métodos para compatibilidade com estrutura anterior
-     */
-    @Deprecated
-    public List<Orcamento> listarPorOficina(Long oficinaId) {
-        return listarPorPrestador(oficinaId);
-    }
+
 }
