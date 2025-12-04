@@ -1,0 +1,45 @@
+package com.hermes.hermes.domain.model.cliente;
+
+import com.hermes.hermes.domain.model.abstracts.Entidade;
+import com.hermes.hermes.domain.model.localizacao.Localizacao;
+import com.hermes.hermes.domain.model.seguradora.Seguradora;
+import com.hermes.hermes.domain.model.usuario.Usuario;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class Cliente extends Entidade {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cli_cliente_seq")
+    @SequenceGenerator(name = "cli_cliente_seq", sequenceName = "cli_cliente_seq", allocationSize = 1)
+    private Long id;
+    @Column(unique = true, length = 15)
+    private String cpf;
+    private String veiculo;
+
+    @OneToOne(optional = false)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
+    private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seguradora_id")
+    private Seguradora seguradora;
+
+    private Double latitude;
+
+    private Double longitude;
+
+    public Localizacao getLocalizacao() {
+        if (latitude != null && longitude != null) {
+            return new Localizacao(null, latitude, longitude, null);
+        }
+        return null;
+    }
+}
