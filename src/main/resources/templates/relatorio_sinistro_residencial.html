@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Sinistro Residencial</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11pt;
+            color: #1e293b;
+            line-height: 1.6;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+        }
+
+        .header {
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1e40af;
+            font-size: 24pt;
+            margin-bottom: 10px;
+        }
+
+        .header .meta {
+            display: flex;
+            justify-content: space-between;
+            color: #64748b;
+            font-size: 10pt;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert.alta {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #991b1b;
+        }
+
+        .alert.media {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert.baixa {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .info-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .info-label {
+            font-size: 9pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 11pt;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 9pt;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge.sim {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge.nao {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .photo-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .caption {
+            padding: 10px;
+            font-size: 9pt;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #64748b;
+            font-size: 9pt;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🏠 Relatório de Sinistro Residencial</h1>
+        <div class="meta">
+            <span><strong>Protocolo:</strong> {{PROTOCOLO}}</span>
+            <span><strong>Data de Emissão:</strong> {{DATA_EMISSAO}}</span>
+        </div>
+    </div>
+
+    <div class="alert {{GRAVIDADE_CLASS}}">
+        <strong>Gravidade: {{GRAVIDADE}}</strong><br>
+        {{GRAVIDADE_TEXTO}}
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">📋 Informações Gerais</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Problema Relatado</div>
+                <div class="info-value">{{PROBLEMA}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Data da Ocorrência</div>
+                <div class="info-value">{{DATA}} às {{HORA}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Tipo de Imóvel</div>
+                <div class="info-value">{{TIPO_IMOVEL}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Endereço</div>
+                <div class="info-value">{{ENDERECO}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">🔍 Detalhes do Sinistro</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Área Atingida</div>
+                <div class="info-value">{{AREA_ATINGIDA}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Tipo de Dano</div>
+                <div class="info-value">{{TIPO_DANO}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Causa Provável</div>
+                <div class="info-value">{{CAUSA_PROVAVEL}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Estrutura Comprometida</div>
+                <div class="info-value">
+                    {{ESTRUTURA_COMPROMETIDA}}
+                    <span class="badge {{ESTRUTURA_COMPROMETIDA_BADGE}}">{{ESTRUTURA_COMPROMETIDA}}</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Imóvel Habitável</div>
+                <div class="info-value">
+                    {{HABITAVEL}}
+                    <span class="badge {{HABITAVEL_BADGE}}">{{HABITAVEL}}</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Valor Estimado dos Danos</div>
+                <div class="info-value">{{VALOR_ESTIMADO}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">🛡️ Informações do Seguro</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Possui Seguro</div>
+                <div class="info-value">
+                    {{POSSUI_SEGURO}}
+                    <span class="badge {{POSSUI_SEGURO_BADGE}}">{{POSSUI_SEGURO}}</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Seguradora</div>
+                <div class="info-value">{{SEGURADORA}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Cobertura</div>
+                <div class="info-value">{{COBERTURA}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">👥 Testemunhas e Autoridades</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Testemunhas</div>
+                <div class="info-value">{{TESTEMUNHAS}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Autoridades Acionadas</div>
+                <div class="info-value">{{AUTORIDADES}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">📸 Evidências Fotográficas</h2>
+        <div class="photo-gallery">
+            {{FOTOS}}
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Hermes - Sistema de Gestão de Sinistros</strong></p>
+        <p>Relatório gerado automaticamente em {{DATA_EMISSAO}}</p>
+        <p>Este documento é confidencial e destinado exclusivamente para fins de análise do sinistro.</p>
+    </div>
+</div>
+</body>
+</html>
