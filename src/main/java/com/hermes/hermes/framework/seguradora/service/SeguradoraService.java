@@ -1,0 +1,78 @@
+package com.hermes.hermes.framework.seguradora.service;
+import com.hermes.hermes.framework.cliente.domain.model.Cliente;
+import com.hermes.hermes.framework.seguradora.domain.model.Seguradora;
+import com.hermes.hermes.framework.exception.DuplicateResourceException;
+import com.hermes.hermes.framework.exception.InvalidResourceStateException;
+import com.hermes.hermes.framework.exception.NotFoundException;
+import com.hermes.hermes.framework.cliente.repository.ClienteRepository;
+import com.hermes.hermes.framework.seguradora.repository.SeguradoraRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+@Transactional
+public class SeguradoraService {
+
+    private final SeguradoraRepository seguradoraRepository;
+    private final ClienteRepository  clienteRepository;
+
+    public List<Seguradora> findAll() {
+        log.info("Buscando todos as seguradoras ativos");
+        return seguradoraRepository.findAll();
+    }
+
+    public Seguradora findById(Long id) {
+        log.info("Buscando cliente com ID: {}", id);
+        return seguradoraRepository.findByIdAndAtivoIsTrue(id)
+                .orElseThrow(() -> new NotFoundException("Seguradora não encontrada com ID: " + id));
+    }
+
+    public List<Cliente> findByClientesDaSeguradora(Long seguradoraId) {
+        return clienteRepository.findBySeguradora_Id(seguradoraId);
+    }
+
+    public Seguradora findByUsuarioId(Long usuarioId) {
+        log.info("Buscando seguradora com usuario ID: {}", usuarioId);
+        return seguradoraRepository.findByAtivoIsTrueAndUsuario_Id(usuarioId)
+                .orElseThrow(() -> new NotFoundException("Seguradora não encontrada com usuário ID: " + usuarioId));
+    }
+
+    public Seguradora create(Seguradora seguradora) {
+        log.info("Criando nova seguradora: {}", seguradora.getUsuario().getNome());
+        if (seguradora.getCnpj() != null && seguradoraRepository.findByCnpj(seguradora.getCnpj()).isPresent()) {
+            throw new DuplicateResourceException("CNPJ já cadastrado: " + seguradora.getCnpj());
+        }
+        if (seguradora.getUsuario() == null || seguradora.getCnpj() == null) {
+            throw new InvalidResourceStateException("Dados obrigatórios da seguradora (usuário ou CNPJ) não fornecidos");
+        }
+        return seguradoraRepository.save(seguradora);
+    }
+
+    public Seguradora update(Long id, Seguradora seguradoraAtualizada) {
+        Seguradora seguradora = findById(id);
+        log.info("Atualizando seguradora com ID: {}", id);
+        if (seguradoraAtualizada.getUsuario() == null || seguradoraAtualizada.getCnpj() == null) {
+            throw new InvalidResourceStateException("Dados obrigatórios da seguradora (usuário ou CNPJ) não fornecidos para atualização");
+        }
+        if (!Objects.equals(seguradora.getCnpj(), seguradoraAtualizada.getCnpj()) &&
+                seguradoraRepository.findByCnpj(seguradoraAtualizada.getCnpj()).isPresent()) {
+            throw new DuplicateResourceException("CNPJ já cadastrado: " + seguradoraAtualizada.getCnpj());
+        }
+        seguradora = seguradoraAtualizada;
+        return seguradoraRepository.saveAndFlush(seguradora);
+    }
+
+    public void delete(Long id) {
+        Seguradora seguradora = findById(id);
+        log.info("Deletando seguradora com ID: {}", id);
+        seguradora.getUsuario().setAtivo(false);
+        seguradoraRepository.save(seguradora);
+    }
+}
