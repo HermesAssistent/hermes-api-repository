@@ -1,7 +1,8 @@
 package com.hermes.hermes.domain.model.oficina;
 
-import com.hermes.hermes.domain.model.abstracts.Entidade;
-import com.hermes.hermes.domain.model.sinistro.SinistroAutomotivo;
+import com.hermes.hermes.framework.abstracts.Entidade;
+import com.hermes.hermes.instancias.automotivo.domain.model.Oficina;
+import com.hermes.hermes.instancias.automotivo.domain.model.SinistroAutomotivo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

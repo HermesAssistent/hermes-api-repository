@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Relatório de Sinistro</title>
+    <style type="text/css">
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+
+        .header {
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1e40af;
+            font-size: 24pt;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            color: #64748b;
+            font-size: 10pt;
+        }
+
+        .header .report-info {
+            margin-top: 15px;
+            font-size: 9pt;
+            color: #64748b;
+        }
+
+        .report-info-item {
+            display: inline-block;
+            margin-right: 40px;
+        }
+
+        .alert-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .alert-box.alta {
+            background: #fee2e2;
+            border-left-color: #dc2626;
+        }
+
+        .alert-box.media {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+
+        .alert-box.baixa {
+            background: #d1fae5;
+            border-left-color: #10b981;
+        }
+
+        .alert-box h2 {
+            font-size: 14pt;
+            margin-bottom: 5px;
+            color: #1f2937;
+        }
+
+        .alert-box p {
+            font-size: 10pt;
+            color: #4b5563;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            font-size: 13pt;
+            font-weight: bold;
+            color: #1e40af;
+            border-left: 4px solid #2563eb;
+            margin-bottom: 15px;
+        }
+
+        .info-grid {
+            margin-bottom: 20px;
+        }
+
+        .info-grid-row {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .info-card {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 4px;
+            display: inline-block;
+            width: 48%;
+            vertical-align: top;
+            margin-right: 2%;
+        }
+
+        .info-card .label {
+            font-size: 9pt;
+            color: #64748b;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .info-card .value {
+            font-size: 11pt;
+            color: #1f2937;
+            font-weight: 600;
+            display: block;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .detail-table tr {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .detail-table td {
+            padding: 12px 10px;
+            vertical-align: top;
+        }
+
+        .detail-table td.label-col {
+            font-weight: bold;
+            color: #475569;
+            width: 35%;
+            font-size: 10pt;
+        }
+
+        .detail-table td.value-col {
+            color: #1f2937;
+            font-size: 10pt;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        .badge.sim {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge.nao {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            font-size: 9pt;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .status-indicator.alta {
+            background: #dc2626;
+        }
+
+        .status-indicator.media {
+            background: #f59e0b;
+        }
+
+        .status-indicator.baixa {
+            background: #10b981;
+        }
+
+        .highlight-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .highlight-box h3 {
+            font-size: 11pt;
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .highlight-box p {
+            font-size: 10pt;
+            color: #374151;
+        }
+
+        .footer p {
+            margin-bottom: 5px;
+        }
+
+        photo-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: flex-start;
+        }
+
+        .photo-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 8px;
+            background: #f8fafc;
+            width: calc(33.333% - 10px);
+            text-align: center;
+            page-break-inside: avoid;
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .photo-card .caption {
+            font-size: 9pt;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>RELATÓRIO DE SINISTRO</h1>
+    <p class="subtitle">Registro e Análise Detalhada do Evento</p>
+    <div class="report-info">
+            <span class="report-info-item">
+                <strong>Protocolo:</strong> {{PROTOCOLO}}
+            </span>
+        <span class="report-info-item">
+                <strong>Data de Emissão:</strong> {{DATA_EMISSAO}}
+            </span>
+    </div>
+</div>
+
+<div class="alert-box {{GRAVIDADE_CLASS}}">
+    <h2>
+        <span class="status-indicator {{GRAVIDADE_CLASS}}"> </span>
+        Gravidade: {{GRAVIDADE}}
+    </h2>
+    <p>{{GRAVIDADE_TEXTO}}</p>
+</div>
+
+<div class="highlight-box">
+    <h3>Descrição do Problema</h3>
+    <p>{{PROBLEMA}}</p>
+</div>
+
+<div class="section">
+    <div class="section-title">INFORMAÇÕES GERAIS</div>
+    <div class="info-grid">
+        <div class="info-grid-row">
+            <div class="info-card">
+                <span class="label">Data do Ocorrido</span>
+                <span class="value">{{DATA}}</span>
+            </div>
+            <div class="info-card">
+                <span class="label">Horário</span>
+                <span class="value">{{HORA}}</span>
+            </div>
+        </div>
+        <div class="info-grid-row">
+            <div class="info-card">
+                <span class="label">Local do Sinistro</span>
+                <span class="value">{{LOCAL}}</span>
+            </div>
+            <div class="info-card">
+                <span class="label">Categoria</span>
+                <span class="value">{{CATEGORIA}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <div class="section-title">DADOS DO VEÍCULO</div>
+    <table class="detail-table">
+        <tr>
+            <td class="label-col">Modelo do Veículo</td>
+            <td class="value-col">{{MODELO_VEICULO}}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Ano de Fabricação</td>
+            <td class="value-col">{{ANO_FABRICACAO}}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Placa</td>
+            <td class="value-col">{{PLACA}}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Danos no Veículo</td>
+            <td class="value-col">{{DANOS_VEICULO}}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Veículo Imobilizado</td>
+            <td class="value-col"><span class="badge {{VEICULO_IMOBILIZADO_BADGE}}">{{VEICULO_IMOBILIZADO}}</span></td>
+        </tr>
+    </table>
+</div>
+
+<div class="section">
+    <div class="section-title">INFORMAÇÕES DO SEGURO</div>
+    <table class="detail-table">
+        <tr>
+            <td class="label-col">Possui Seguro</td>
+            <td class="value-col"><span class="badge {{POSSUI_SEGURO_BADGE}}">{{POSSUI_SEGURO}}</span></td>
+        </tr>
+        <tr>
+            <td class="label-col">Seguradora</td>
+            <td class="value-col">{{SEGURADORA}}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Cobertura</td>
+            <td class="value-col">{{COBERTURA}}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="section">
+    <div class="section-title">DETALHES DO ACIDENTE</div>
+    <table class="detail-table">
+        <tr>
+            <td class="label-col">Outros Veículos Envolvidos</td>
+            <td class="value-col"><span class="badge {{OUTROS_ENVOLVIDOS_BADGE}}">{{OUTROS_ENVOLVIDOS}}</span></td>
+        </tr>
+        <tr>
+            <td class="label-col">Pessoas Feridas</td>
+            <td class="value-col"><span class="badge {{FERIDOS_BADGE}}">{{FERIDOS}}</span></td>
+        </tr>
+        <tr>
+            <td class="label-col">Condições Climáticas</td>
+            <td class="value-col">{{CONDICOES_CLIMATICAS}}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Condições da Via</td>
+            <td class="value-col">{{CONDICOES_VIA}}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Testemunhas</td>
+            <td class="value-col">{{TESTEMUNHAS}}</td>
+        </tr>
+        <tr>
+            <td class="label-col">Autoridades Acionadas</td>
+            <td class="value-col">{{AUTORIDADES}}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="section">
+    <div class="section-title">ANEXOS - REGISTROS FOTOGRÁFICOS</div>
+    <div class="photo-grid">
+        {{FOTOS}}
+    </div>
+</div>
+
+<div class="footer">
+    <p><strong>Documento gerado automaticamente pelo Sistema de Gerenciamento de Sinistros</strong></p>
+    <p>Este relatório contém informações confidenciais e deve ser tratado com sigilo adequado.</p>
+    <p style="margin-top: 10px;">Página 1 de 1</p>
+</div>
+</body>
+</html>
