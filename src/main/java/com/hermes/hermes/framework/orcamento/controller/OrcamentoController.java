@@ -166,6 +166,36 @@ public class OrcamentoController {
         return ResponseEntity.ok(mapToNovoResponseDto(atualizado));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<OrcamentoResponseDto> atualizarOrcamento(
+            @PathVariable Long id,
+            @Valid @RequestBody OrcamentoRequestDto dto) {
+        log.info("Atualizando orçamento {}", id);
+        
+        Orcamento orcamentoExistente = orcamentoService.buscarPorId(id);
+        
+        // Atualiza observações se fornecido
+        if (dto.getObservacoes() != null) {
+            orcamentoExistente.setObservacoes(dto.getObservacoes());
+        }
+        
+        // Atualiza prestador se fornecido
+        if (dto.getPrestadorId() != null) {
+            Orcamento atualizado = orcamentoService.atualizarPrestador(id, dto.getPrestadorId());
+            return ResponseEntity.ok(mapToNovoResponseDto(atualizado));
+        }
+        
+        Orcamento salvo = orcamentoService.salvar(orcamentoExistente, dto.getSinistroId(), dto.getPrestadorId(), dto.getTipoSinistro());
+        return ResponseEntity.ok(mapToNovoResponseDto(salvo));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarOrcamento(@PathVariable Long id) {
+        log.info("Deletando orçamento {}", id);
+        orcamentoService.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
+
     private OrcamentoResponseDto mapToNovoResponseDto(Orcamento orcamento) {
         List<OrcamentoResponseDto.ItemOrcamentoResponseDto> itensDto = null;
         if (orcamento.getItens() != null) {
@@ -306,30 +336,13 @@ public class OrcamentoController {
         return custo;
     }
 
-    @PostMapping("/gerar-automatico")
-    public ResponseEntity<OrcamentoResponseDto> gerarOrcamentoAutomatico(
-            @RequestParam Long sinistroId,
-            @RequestParam(required = false) Long prestadorId,
-            @RequestParam String tipoSinistro) {
-        log.info("Gerando orçamento automático para sinistro {} do tipo {}", sinistroId, tipoSinistro);
+    @GetMapping("/formulario/{tipoSinistro}")
+    public ResponseEntity<java.util.Map<String, Object>> obterFormularioOrcamento(@PathVariable String tipoSinistro) {
+        log.info("Buscando formulário de orçamento para tipo: {}", tipoSinistro);
         
-        Orcamento orcamento = orcamentoService.gerarOrcamentoAutomatico(sinistroId, prestadorId, tipoSinistro);
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapToNovoResponseDto(orcamento));
-    }
-
-    @GetMapping("/estimar-custos")
-    public ResponseEntity<java.util.Map<String, Object>> estimarCustos(
-            @RequestParam Long sinistroId,
-            @RequestParam String tipoSinistro) {
-        log.info("Estimando custos para sinistro {} do tipo {}", sinistroId, tipoSinistro);
+        java.util.Map<String, Object> formulario = orcamentoService.obterFormularioPorTipo(tipoSinistro);
         
-        java.math.BigDecimal custoEstimado = orcamentoService.calcularCustosEstimados(sinistroId, tipoSinistro);
-        
-        return ResponseEntity.ok(java.util.Map.of(
-            "sinistroId", sinistroId,
-            "tipoSinistro", tipoSinistro,
-            "custoEstimado", custoEstimado
-        ));
+        return ResponseEntity.ok(formulario);
     }
 
 }

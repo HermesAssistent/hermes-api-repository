@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -62,60 +63,6 @@ public class OrcamentoService {
         return orcamentoRepository.save(orcamento);
     }
 
-    public Orcamento gerarOrcamentoAutomatico(Long sinistroId, Long prestadorId, String tipoSinistro) {
-        String tipoSinistroCompleto = mapearTipoSinistro(tipoSinistro);
-        SinistroBase sinistro = sinistroService.buscarPorId(sinistroId, tipoSinistroCompleto);
-        
-        OrcamentoStrategy strategy = orcamentoStrategies.stream()
-                .filter(s -> s.suportaTipo(tipoSinistro))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Strategy de orçamento não encontrada para tipo: " + tipoSinistro));
-        
-        List<ItemOrcamento> itensGerados = strategy.criarItensOrcamento(sinistro);
-        
-        Orcamento orcamento = new Orcamento();
-        orcamento.setSinistro(sinistro);
-        orcamento.setObservacoes("Orçamento gerado automaticamente");
-        
-        if (prestadorId != null) {
-            Oficina prestador = oficinaRepository.findById(prestadorId)
-                    .orElseThrow(() -> new NotFoundException("Prestador não encontrado"));
-            orcamento.setPrestador(prestador);
-        }
-        
-        if (itensGerados != null && !itensGerados.isEmpty()) {
-            itensGerados.forEach(orcamento::adicionarItem);
-        }
-        
-        return orcamentoRepository.save(orcamento);
-    }
-
-    public BigDecimal calcularCustosEstimados(Long sinistroId, String tipoSinistro) {
-        String tipoSinistroCompleto = mapearTipoSinistro(tipoSinistro);
-        SinistroBase sinistro = sinistroService.buscarPorId(sinistroId, tipoSinistroCompleto);
-        
-        OrcamentoStrategy strategy = orcamentoStrategies.stream()
-                .filter(s -> s.suportaTipo(tipoSinistro))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Strategy de orçamento não encontrada para tipo: " + tipoSinistro));
-        
-        return strategy.calcularCustos(sinistro);
-    }
-    
-    private String mapearTipoSinistro(String tipoOrcamento) {
-        String tipo = tipoOrcamento.toLowerCase();
-        if (tipo.contains("automotivo") || tipo.contains("colisao") || tipo.contains("veiculo") || tipo.contains("carro")) {
-            return "sinistroAutomotivo";
-        }
-        if (tipo.contains("transporte") || tipo.contains("carga") || tipo.contains("avaria") || tipo.contains("logistica")) {
-            return "sinistroTransporte";
-        }
-        if (tipo.contains("domestico") || tipo.contains("vazamento") || tipo.contains("residencial")) {
-            return "sinistroResidencial";
-        }
-        return tipoOrcamento;
-    }
-
     public List<Orcamento> listarPorSinistro(Long sinistroId) {
         return orcamentoRepository.findBySinistroId(sinistroId);
     }
@@ -149,6 +96,15 @@ public class OrcamentoService {
         orcamento.setStatus(novoStatus);
         return orcamentoRepository.save(orcamento);
     }
+    
+    public Map<String, Object> obterFormularioPorTipo(String tipoSinistro) {
+        OrcamentoStrategy strategy = orcamentoStrategies.stream()
+                .filter(s -> s.suportaTipo(tipoSinistro))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Strategy de orçamento não encontrada para tipo: " + tipoSinistro));
+        
+        return strategy.obterFormulario();
+    }
 
     public Orcamento buscarPorId(Long id) {
         return orcamentoRepository.findById(id)
@@ -181,5 +137,20 @@ public class OrcamentoService {
         orcamento.adicionarItem(itemAtualizado);
         
         return orcamentoRepository.save(orcamento);
+    }
+    
+    public Orcamento atualizarPrestador(Long orcamentoId, Long prestadorId) {
+        Orcamento orcamento = buscarPorId(orcamentoId);
+        
+        Oficina prestador = oficinaRepository.findById(prestadorId)
+                .orElseThrow(() -> new NotFoundException("Prestador não encontrado"));
+        
+        orcamento.setPrestador(prestador);
+        return orcamentoRepository.save(orcamento);
+    }
+    
+    public void deletar(Long id) {
+        Orcamento orcamento = buscarPorId(id);
+        orcamentoRepository.delete(orcamento);
     }
 }
