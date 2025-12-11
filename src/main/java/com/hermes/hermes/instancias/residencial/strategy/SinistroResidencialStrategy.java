@@ -38,7 +38,6 @@ public class SinistroResidencialStrategy implements SinistroStrategy {
             throw new BusinessException("É necessário informar a área atingida");
         }
 
-        // Validações de lógica de negócio
         if (Boolean.TRUE.equals(sinistroResidencial.getEstruturaComprometida())
                 && Boolean.TRUE.equals(sinistroResidencial.getHabitavel())) {
             throw new BusinessException(
@@ -46,10 +45,13 @@ public class SinistroResidencialStrategy implements SinistroStrategy {
             );
         }
 
-        // Se tem seguro, deve informar a seguradora
         if (Boolean.TRUE.equals(sinistroResidencial.getPossuiSeguro())
                 && (sinistroResidencial.getSeguradora() == null || sinistroResidencial.getSeguradora().isBlank())) {
             throw new BusinessException("É necessário informar a seguradora quando possui seguro");
+        }
+
+        if (sinistroResidencial.getProblema() == null || sinistroResidencial.getProblema().isEmpty()) {
+            throw new BusinessException("É necessário informar o problema");
         }
     }
 

@@ -16,7 +16,7 @@ import java.util.Map;
 public class SinistroTransporteStrategy implements SinistroStrategy {
 
     @Override
-    public SinistroBase criarSinistro(Map<String, Object> dados, GeocodingService geocodingService) {
+    public SinistroTransporte criarSinistro(Map<String, Object> dados, GeocodingService geocodingService) {
         SinistroTransporte sinistro = SinistroTransporte.fromMap(dados, geocodingService);
         validar(sinistro);
         return sinistro;

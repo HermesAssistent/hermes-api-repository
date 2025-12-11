@@ -43,7 +43,7 @@ public class SinistroAutomotivoDto implements SinistroBaseDto {
         if (entity == null) {
             return null;
         }
-        List<FotoDto> fotoDtos = entity.getFotos().stream()
+        List<FotoDto> fotoDtos = entity.getFotos() != null ? entity.getFotos().stream()
                 .map(foto -> {
                     FotoDto fotoDto = new FotoDto();
                     fotoDto.setId(foto.getId());
@@ -53,7 +53,7 @@ public class SinistroAutomotivoDto implements SinistroBaseDto {
                     fotoDto.setSinistroId(foto.getSinistro() != null ? foto.getSinistro().getId() : null);
                     return fotoDto;
                 })
-                .toList();
+                .toList() : List.of();
         return SinistroAutomotivoDto.builder()
                 .id(entity.getId())
                 .problema(entity.getProblema())

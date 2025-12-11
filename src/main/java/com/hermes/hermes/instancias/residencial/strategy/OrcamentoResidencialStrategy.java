@@ -4,109 +4,50 @@ import com.hermes.hermes.instancias.residencial.domain.enums.NivelUrgencia;
 import com.hermes.hermes.framework.orcamento.domain.model.ItemOrcamento;
 import com.hermes.hermes.instancias.residencial.domain.model.Material;
 import com.hermes.hermes.instancias.residencial.domain.model.ServicoTecnico;
+import com.hermes.hermes.framework.orcamento.domain.strategy.AbstractOrcamentoStrategy;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
-import com.hermes.hermes.framework.orcamento.domain.strategy.OrcamentoStrategy;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
-public class OrcamentoResidencialStrategy implements OrcamentoStrategy {
-    
-    @Override
-    public BigDecimal calcularCustos(SinistroBase sinistro) {
-        List<ItemOrcamento> itens = criarItensOrcamento(sinistro);
-        
-        BigDecimal custoBase = itens.stream()
-                .map(ItemOrcamento::calcularSubtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
-        // Aplica multiplicador de urgência
-        return aplicarUrgencia(custoBase, determinarUrgencia(sinistro));
-    }
+public class OrcamentoDomesticoStrategy extends AbstractOrcamentoStrategy {
     
     @Override
     public List<ItemOrcamento> criarItensOrcamento(SinistroBase sinistro) {
-        List<ItemOrcamento> itens = new ArrayList<>();
-        
-        // Adiciona materiais básicos
-        itens.addAll(criarMateriaisBasicos(sinistro));
-        
-        // Adiciona serviços técnicos
-        itens.addAll(criarServicosTecnicos(sinistro));
-        
-        return itens;
+        // Retorna lista vazia - itens serão adicionados manualmente
+        return new ArrayList<>();
     }
     
     @Override
-    public boolean suportaTipo(String tipoSinistro) {
-        return tipoSinistro != null && 
-               (tipoSinistro.contains("DOMESTICO") || 
-                tipoSinistro.contains("VAZAMENTO") ||
-                tipoSinistro.contains("ELETRICO") ||
-                tipoSinistro.contains("INFILTRACAO"));
+    protected String[] getPalavrasChave() {
+        return new String[]{"domestico", "vazamento", "eletrico", "infiltracao", "residencial"};
     }
     
-    
-    private BigDecimal aplicarUrgencia(BigDecimal custoBase, NivelUrgencia urgencia) {
-        BigDecimal multiplicador = switch (urgencia) {
-            case EMERGENCIAL -> new BigDecimal("1.5"); // +50%
-            case URGENTE -> new BigDecimal("1.3");     // +30%
-            case NORMAL -> BigDecimal.ONE;             // sem acréscimo
-        };
-        
-        return custoBase.multiply(multiplicador);
-    }
-    
-    
-    private NivelUrgencia determinarUrgencia(SinistroBase sinistro) {
-        String problema = sinistro.getProblema() != null ? sinistro.getProblema().toLowerCase() : "";
-        
-        if (problema.contains("emergencia") || problema.contains("urgente") || 
-            problema.contains("vazamento grave") || problema.contains("incendio")) {
-            return NivelUrgencia.EMERGENCIAL;
-        } else if (problema.contains("vazamento") || problema.contains("eletrico")) {
-            return NivelUrgencia.URGENTE;
-        } else {
-            return NivelUrgencia.NORMAL;
-        }
-    }
-    
-    
-    private List<Material> criarMateriaisBasicos(SinistroBase sinistro) {
-        List<Material> materiais = new ArrayList<>();
-        
-        // Material exemplo
-        Material material = new Material();
-        material.setDescricao("Material hidráulico básico");
-        material.setUnidadeMedida("metro");
-        material.setCategoria("Hidráulica");
-        material.setFornecedor("Local");
-        material.setValor(new BigDecimal("25.00"));
-        material.setQuantidade(5);
-        material.setQuantidadeEstoque(100);
-        materiais.add(material);
-        
-        return materiais;
-    }
-    
-    
-    private List<ServicoTecnico> criarServicosTecnicos(SinistroBase sinistro) {
-        List<ServicoTecnico> servicos = new ArrayList<>();
-        
-        // Serviço exemplo
-        ServicoTecnico servico = new ServicoTecnico();
-        servico.setDescricao("Reparo hidráulico");
-        servico.setEspecialidade("Encanador");
-        servico.setHorasEstimadas(3);
-        servico.setValorHora(new BigDecimal("80.00"));
-        servico.setComplexidadeServico("MEDIO");
-        servico.setRequerCertificacao(false);
-        servico.setQuantidade(1);
-        servicos.add(servico);
-        
-        return servicos;
+    @Override
+    public Map<String, Object> obterFormulario() {
+        return Map.of(
+            "tipoSinistro", "DOMESTICO",
+            "tiposItem", List.of("MATERIAL", "SERVICO_TECNICO"),
+            "campos", Map.of(
+                "MATERIAL", List.of(
+                    Map.of("nome", "descricao", "tipo", "string", "obrigatorio", true, "descricao", "Descrição do material"),
+                    Map.of("nome", "unidadeMedida", "tipo", "string", "obrigatorio", true, "descricao", "Unidade (m², litros, kg, etc)"),
+                    Map.of("nome", "categoria", "tipo", "string", "obrigatorio", false, "descricao", "Categoria do material"),
+                    Map.of("nome", "fornecedor", "tipo", "string", "obrigatorio", false, "descricao", "Fornecedor"),
+                    Map.of("nome", "valor", "tipo", "decimal", "obrigatorio", true, "descricao", "Valor unitário"),
+                    Map.of("nome", "quantidade", "tipo", "number", "obrigatorio", true, "descricao", "Quantidade")
+                ),
+                "SERVICO_TECNICO", List.of(
+                    Map.of("nome", "descricao", "tipo", "string", "obrigatorio", true, "descricao", "Descrição do serviço"),
+                    Map.of("nome", "especialidade", "tipo", "string", "obrigatorio", false, "descricao", "Especialidade (encanador, eletricista, etc)"),
+                    Map.of("nome", "horasEstimadas", "tipo", "number", "obrigatorio", true, "descricao", "Horas estimadas"),
+                    Map.of("nome", "valorHora", "tipo", "decimal", "obrigatorio", true, "descricao", "Valor por hora"),
+                    Map.of("nome", "quantidade", "tipo", "number", "obrigatorio", true, "descricao", "Quantidade de serviços")
+                )
+            )
+        );
     }
 }

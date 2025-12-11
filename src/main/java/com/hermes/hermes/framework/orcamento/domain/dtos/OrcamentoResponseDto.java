@@ -36,6 +36,6 @@ public class OrcamentoResponseDto {
         private BigDecimal valor;
         private Integer quantidade;
         private BigDecimal subtotal;
-        private String tipo; // PECA, MAO_DE_OBRA, MATERIAL, etc.
+        private String tipo;
     }
 }

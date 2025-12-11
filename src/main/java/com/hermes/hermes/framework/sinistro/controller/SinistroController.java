@@ -5,12 +5,12 @@ import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.framework.sinistro.service.SinistroService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -28,6 +28,16 @@ public class SinistroController {
     @GetMapping("/{id}")
     public List<SinistroBaseDto> listarSinistrosDoCliente(@PathVariable String id) {
         return sinistroService.findByClienteId(id).stream().map(SinistroBase::toDto).toList();
+    }
+    
+    @PostMapping("/criar")
+    public ResponseEntity<SinistroBaseDto> criarSinistro(@RequestBody Map<String, Object> dados) {
+        log.info("Criando sinistro do tipo: {}", dados.get("tipo"));
+        
+        String tipo = dados.get("tipo").toString();
+        SinistroBase sinistro = sinistroService.criar(tipo, dados);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(sinistro.toDto());
     }
 
 }
