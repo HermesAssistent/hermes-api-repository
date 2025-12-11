@@ -2,6 +2,7 @@ package com.hermes.hermes.framework.chat.service;
 import com.hermes.hermes.framework.chat.domain.model.ChatMessage;
 import com.hermes.hermes.framework.chat.domain.model.ChatSession;
 import com.hermes.hermes.framework.cliente.domain.model.Cliente;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.framework.exception.ExternalServiceException;
 import com.hermes.hermes.framework.exception.InvalidResourceStateException;
@@ -51,7 +52,7 @@ public class ChatService {
         this.sinistroService = sinistroService;
     }
 
-    public Map<String, Object> iniciarChat(Long userId) {
+    public Map<String, Object> iniciarChat(Long userId, TipoSinistro tipoSinistro) {
         Optional<ChatSession> existing = sessionRepository.findByUserIdAndAtivoIsTrue(userId);
         if (existing.isPresent()) {
             return Map.of(
@@ -69,7 +70,10 @@ public class ChatService {
         // Chama API Python para iniciar sessão externa
         Map respostaExterna = webClient.post()
                 .uri("/iniciar-chat")
-                .bodyValue(Map.of("user_id", userId.toString()))
+                .bodyValue(Map.of(
+                        "user_id", userId.toString(),
+                        "tipo_sinistro", tipoSinistro.name()
+                ))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
@@ -137,7 +141,8 @@ public class ChatService {
         if (Boolean.TRUE.equals(respostaExterna.get("conversa_finalizada"))) {
             Map<String, Object> resultado = (Map<String, Object>) respostaExterna.get("resultado");
 
-            String tipoSinistro = (String) resultado.get("tipo");
+            String tipoString = (String) resultado.get("tipo");
+            TipoSinistro tipoSinistro = TipoSinistro.fromString(tipoString);
 
             SinistroBase sinistro = sinistroService.criar(tipoSinistro, resultado);
             Cliente cliente = clienteService.findByUsuarioId(userId);

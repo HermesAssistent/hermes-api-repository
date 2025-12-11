@@ -7,6 +7,7 @@ import com.hermes.hermes.framework.orcamento.domain.enums.StatusOrcamento;
 import com.hermes.hermes.framework.orcamento.domain.model.ItemOrcamento;
 import com.hermes.hermes.framework.orcamento.domain.model.Orcamento;
 import com.hermes.hermes.framework.orcamento.service.OrcamentoService;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class OrcamentoController {
         Orcamento orcamento = new Orcamento();
         orcamento.setObservacoes(dto.getObservacoes());
 
-        String tipoSinistro = dto.getTipoSinistro();
+        TipoSinistro tipoSinistro = dto.getTipoSinistro();
 
         Orcamento salvo = orcamentoService.salvar(orcamento, dto.getSinistroId(), dto.getPrestadorId(), tipoSinistro);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapToNovoResponseDto(salvo));

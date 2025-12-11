@@ -1,4 +1,4 @@
-package com.hermes.hermes.instancias.domestico.domain.model;
+package com.hermes.hermes.instancias.residencial.domain.model;
 
 import com.hermes.hermes.framework.orcamento.domain.model.ItemOrcamento;
 import jakarta.persistence.Column;

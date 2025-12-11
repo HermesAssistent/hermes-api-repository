@@ -2,6 +2,7 @@ package com.hermes.hermes.framework.relatorio.service;
 
 import com.hermes.hermes.framework.exception.FileStorageException;
 import com.hermes.hermes.framework.relatorio.domain.strategy.GeradorRelatorioStrategy;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.framework.sinistro.service.SinistroService;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -29,7 +30,7 @@ public class RelatorioService {
      * @param tipoSinistro tipo do sinistro (automotivo, residencial, carga)
      * @return bytes do PDF gerado
      */
-    public byte[] gerarPdf(Long sinistroId, String tipoSinistro) {
+    public byte[] gerarPdf(Long sinistroId, TipoSinistro tipoSinistro) {
         log.info("Gerando relatório para sinistro ID: {} do tipo: {}", sinistroId, tipoSinistro);
 
         // Buscar sinistro

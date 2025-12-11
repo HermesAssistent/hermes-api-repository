@@ -1,6 +1,7 @@
 package com.hermes.hermes.framework.relatorio.controller;
 
 import com.hermes.hermes.framework.relatorio.service.RelatorioService;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +26,8 @@ public class RelatorioController {
         log.info("Requisição de relatório recebida - ID: {}, Tipo: {}", id, tipoSinistro);
 
         try {
-            byte[] pdfBytes = relatorioService.gerarPdf(id, tipoSinistro);
+            TipoSinistro tipo = TipoSinistro.fromString(tipoSinistro);
+            byte[] pdfBytes = relatorioService.gerarPdf(id, tipo);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);

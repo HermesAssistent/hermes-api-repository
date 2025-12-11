@@ -2,6 +2,7 @@ package com.hermes.hermes.framework.chat.controller;
 
 import com.hermes.hermes.framework.chat.domain.model.ChatSession;
 import com.hermes.hermes.framework.chat.domain.model.Foto;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.framework.chat.service.ChatSessionService;
 import com.hermes.hermes.framework.chat.service.FotoService;
@@ -25,7 +26,7 @@ public class FotoController {
             @RequestParam("arquivo") MultipartFile arquivo,
             @RequestParam(value = "sessionId", required = false) Long sessionId,
             @RequestParam(value = "sinistroId", required = false) Long sinistroId,
-            @RequestParam(value = "tipoSinistro", required = false) String tipoSinistro
+            @RequestParam(value = "tipoSinistro", required = false) TipoSinistro tipoSinistro
     ) {
         ChatSession session = null;
         SinistroBase sinistro = null;

@@ -2,6 +2,7 @@ package com.hermes.hermes.framework.chat.controller;
 
 import com.hermes.hermes.framework.chat.domain.model.ChatMessage;
 import com.hermes.hermes.framework.chat.service.ChatService;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,8 @@ public class ChatController {
     }
 
     @PostMapping("/iniciar")
-    public Map iniciar(@RequestParam Long userId) {
-        return chatService.iniciarChat(userId);
+    public Map iniciar(@RequestParam Long userId, @RequestParam String tipoSinistro) {
+        return chatService.iniciarChat(userId, TipoSinistro.fromString(tipoSinistro));
     }
 
     @PostMapping("/processar")

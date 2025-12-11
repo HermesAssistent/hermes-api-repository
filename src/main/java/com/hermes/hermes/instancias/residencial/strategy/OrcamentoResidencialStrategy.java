@@ -1,9 +1,9 @@
-package com.hermes.hermes.instancias.domestico.strategy;
+package com.hermes.hermes.instancias.residencial.strategy;
 
-import com.hermes.hermes.instancias.domestico.domain.enums.NivelUrgencia;
+import com.hermes.hermes.instancias.residencial.domain.enums.NivelUrgencia;
 import com.hermes.hermes.framework.orcamento.domain.model.ItemOrcamento;
-import com.hermes.hermes.instancias.domestico.domain.model.Material;
-import com.hermes.hermes.instancias.domestico.domain.model.ServicoTecnico;
+import com.hermes.hermes.instancias.residencial.domain.model.Material;
+import com.hermes.hermes.instancias.residencial.domain.model.ServicoTecnico;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.framework.orcamento.domain.strategy.OrcamentoStrategy;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class OrcamentoDomesticoStrategy implements OrcamentoStrategy {
+public class OrcamentoResidencialStrategy implements OrcamentoStrategy {
     
     @Override
     public BigDecimal calcularCustos(SinistroBase sinistro) {

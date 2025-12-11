@@ -1,6 +1,7 @@
-package com.hermes.hermes.instancias.domestico.strategy;
-import com.hermes.hermes.instancias.domestico.domain.dtos.SinistroDomesticoDto;
-import com.hermes.hermes.instancias.domestico.domain.model.SinistroResidencial;
+package com.hermes.hermes.instancias.residencial.strategy;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
+import com.hermes.hermes.instancias.residencial.domain.dtos.SinistroResidencialDto;
+import com.hermes.hermes.instancias.residencial.domain.model.SinistroResidencial;
 import com.hermes.hermes.framework.chat.domain.dtos.FotoDto;
 import com.hermes.hermes.framework.relatorio.domain.strategy.GeradorRelatorioStrategy;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
@@ -18,12 +19,11 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class GeradorRelatorioDomesticoStrategy implements GeradorRelatorioStrategy {
+public class GeradorRelatorioResidencialStrategy implements GeradorRelatorioStrategy {
 
     @Override
-    public boolean suporta(String tipoSinistro) {
-        return "residencial".equalsIgnoreCase(tipoSinistro) ||
-                "casa".equalsIgnoreCase(tipoSinistro);
+    public boolean suporta(TipoSinistro tipoSinistro) {
+        return tipoSinistro.equals(TipoSinistro.RESIDENCIAL);
     }
 
     @Override
@@ -34,13 +34,13 @@ public class GeradorRelatorioDomesticoStrategy implements GeradorRelatorioStrate
     @Override
     public String gerarHtml(SinistroBase sinistro) {
         SinistroResidencial sinistroResidencial = (SinistroResidencial) sinistro;
-        SinistroDomesticoDto dto = SinistroDomesticoDto.fromEntity(sinistroResidencial);
+        SinistroResidencialDto dto = SinistroResidencialDto.fromEntity(sinistroResidencial);
 
         String html = "{{TEMPLATE}}"; // Será substituído pelo template real
         return preencherTemplate(html, dto);
     }
 
-    private String preencherTemplate(String html, SinistroDomesticoDto sinistro) {
+    private String preencherTemplate(String html, SinistroResidencialDto sinistro) {
         String dataEmissao = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String gravidadeClass = determinarGravidadeClass(sinistro.getGravidade());
 

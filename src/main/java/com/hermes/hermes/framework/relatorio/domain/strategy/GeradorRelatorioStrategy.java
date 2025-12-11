@@ -1,6 +1,7 @@
 package com.hermes.hermes.framework.relatorio.domain.strategy;
 
 
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 
 /**
@@ -11,7 +12,7 @@ public interface GeradorRelatorioStrategy {
     /**
      * Verifica se esta estratégia suporta o tipo de sinistro informado
      */
-    boolean suporta(String tipoSinistro);
+    boolean suporta(TipoSinistro tipoSinistro);
 
     /**
      * Gera o HTML preenchido com os dados do sinistro

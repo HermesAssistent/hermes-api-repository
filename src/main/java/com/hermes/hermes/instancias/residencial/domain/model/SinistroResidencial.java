@@ -1,10 +1,10 @@
-package com.hermes.hermes.instancias.domestico.domain.model;
+package com.hermes.hermes.instancias.residencial.domain.model;
 
 import com.hermes.hermes.framework.localizacao.domain.model.Localizacao;
 import com.hermes.hermes.framework.localizacao.service.GeocodingService;
 import com.hermes.hermes.framework.sinistro.domain.dtos.SinistroBaseDto;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
-import com.hermes.hermes.instancias.domestico.domain.dtos.SinistroDomesticoDto;
+import com.hermes.hermes.instancias.residencial.domain.dtos.SinistroResidencialDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -136,6 +136,6 @@ public class SinistroResidencial extends SinistroBase {
 
     @Override
     public SinistroBaseDto toDto() {
-        return SinistroDomesticoDto.fromEntity(this);
+        return SinistroResidencialDto.fromEntity(this);
     }
 }

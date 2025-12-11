@@ -1,6 +1,7 @@
 package com.hermes.hermes.framework.relatorio.service;
 
 import com.hermes.hermes.framework.relatorio.domain.strategy.GeradorRelatorioStrategy;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,7 @@ public class GeradorRelatorioFactory {
      * @return estratégia correspondente
      * @throws IllegalArgumentException se não houver estratégia para o tipo
      */
-    public GeradorRelatorioStrategy obterStrategy(String tipoSinistro) {
+    public GeradorRelatorioStrategy obterStrategy(TipoSinistro tipoSinistro) {
         return strategies.stream()
                 .filter(strategy -> strategy.suporta(tipoSinistro))
                 .findFirst()

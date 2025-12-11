@@ -1,4 +1,4 @@
-package com.hermes.hermes.instancias.domestico.domain.enums;
+package com.hermes.hermes.instancias.residencial.domain.enums;
 
 /**
  * Níveis de urgência para sinistros domésticos.

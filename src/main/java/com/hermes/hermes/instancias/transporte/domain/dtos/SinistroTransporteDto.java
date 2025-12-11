@@ -2,7 +2,7 @@ package com.hermes.hermes.instancias.transporte.domain.dtos;
 
 import com.hermes.hermes.framework.chat.domain.dtos.FotoDto;
 import com.hermes.hermes.framework.sinistro.domain.dtos.SinistroBaseDto;
-import com.hermes.hermes.instancias.transporte.domain.model.SinistroCarga;
+import com.hermes.hermes.instancias.transporte.domain.model.SinistroTransporte;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -48,7 +48,7 @@ public class SinistroTransporteDto implements SinistroBaseDto {
 
     private List<FotoDto> fotos;
 
-    public static SinistroTransporteDto fromEntity(SinistroCarga entity) {
+    public static SinistroTransporteDto fromEntity(SinistroTransporte entity) {
         if (entity == null) {
             return null;
         }

@@ -1,5 +1,6 @@
 package com.hermes.hermes.framework.orcamento.domain.dtos;
 
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -24,5 +25,5 @@ public class OrcamentoRequestDto {
     @Builder.Default
     private Boolean gerarItensAutomaticamente = true;
 
-    private String tipoSinistro;
+    private TipoSinistro tipoSinistro;
 }

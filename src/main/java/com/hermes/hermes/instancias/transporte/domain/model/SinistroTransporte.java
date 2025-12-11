@@ -18,7 +18,7 @@ import java.util.Map;
 @Builder
 @Entity
 @Table(name = "sinistro_carga")
-public class SinistroCarga extends SinistroBase {
+public class SinistroTransporte extends SinistroBase {
 
     private String numeroNotaFiscal;
     private String tipoCarga; // Perecível, Frágil, Granel, Container, etc
@@ -46,8 +46,8 @@ public class SinistroCarga extends SinistroBase {
     @Embedded
     private Localizacao localizacao;
 
-    public static SinistroCarga fromMap(Map<String, Object> map, GeocodingService geocodingService) {
-        SinistroCarga s = new SinistroCarga();
+    public static SinistroTransporte fromMap(Map<String, Object> map, GeocodingService geocodingService) {
+        SinistroTransporte s = new SinistroTransporte();
 
         if (map.containsKey("problema") && map.get("problema") != null)
             s.setProblema(map.get("problema").toString());

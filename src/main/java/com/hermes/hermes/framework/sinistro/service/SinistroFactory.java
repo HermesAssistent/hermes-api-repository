@@ -1,5 +1,6 @@
 package com.hermes.hermes.framework.sinistro.service;
 
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.framework.sinistro.domain.strategy.SinistroStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,18 +11,19 @@ import java.util.Map;
 
 @Component
 public class SinistroFactory {
-    private final Map<String, SinistroStrategy> strategies = new HashMap<>();
+    private final Map<TipoSinistro, SinistroStrategy> strategies = new HashMap<>();
 
     @Autowired
     public SinistroFactory(List<SinistroStrategy> strategiesList) {
         System.out.println("Strategies encontradas:");
-        strategiesList.forEach(s -> System.out.println("- " + s.getClass().getSimpleName()));
+        strategiesList.forEach(s -> System.out.println("- " + s.getTipo()));
         for (SinistroStrategy strategy : strategiesList) {
-            strategies.put(strategy.getTipo(), strategy);
+            TipoSinistro tipo = strategy.getTipo();
+            strategies.put(tipo, strategy);
         }
     }
 
-    public SinistroStrategy getStrategy(String tipo) {
+    public SinistroStrategy getStrategy(TipoSinistro tipo) {
         return strategies.get(tipo);
     }
 }

@@ -1,8 +1,8 @@
-package com.hermes.hermes.instancias.domestico.domain.dtos;
+package com.hermes.hermes.instancias.residencial.domain.dtos;
 
 import com.hermes.hermes.framework.chat.domain.dtos.FotoDto;
 import com.hermes.hermes.framework.sinistro.domain.dtos.SinistroBaseDto;
-import com.hermes.hermes.instancias.domestico.domain.model.SinistroResidencial;
+import com.hermes.hermes.instancias.residencial.domain.model.SinistroResidencial;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SinistroDomesticoDto implements SinistroBaseDto {
+public class SinistroResidencialDto implements SinistroBaseDto {
     private Long id;
     private String problema;
     private String data;
@@ -39,7 +39,7 @@ public class SinistroDomesticoDto implements SinistroBaseDto {
 
     private List<FotoDto> fotos;
 
-    public static SinistroDomesticoDto fromEntity(SinistroResidencial entity) {
+    public static SinistroResidencialDto fromEntity(SinistroResidencial entity) {
         if (entity == null) {
             return null;
         }
@@ -56,7 +56,7 @@ public class SinistroDomesticoDto implements SinistroBaseDto {
                 })
                 .toList();
 
-        return SinistroDomesticoDto.builder()
+        return SinistroResidencialDto.builder()
                 .id(entity.getId())
                 .problema(entity.getProblema())
                 .data(entity.getData())

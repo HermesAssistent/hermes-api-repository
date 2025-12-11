@@ -3,6 +3,7 @@ package com.hermes.hermes.framework.orcamento.service;
 import com.hermes.hermes.framework.orcamento.domain.enums.StatusOrcamento;
 import com.hermes.hermes.framework.orcamento.domain.model.ItemOrcamento;
 import com.hermes.hermes.framework.orcamento.domain.model.Orcamento;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.instancias.automotivo.domain.model.Oficina;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.framework.orcamento.domain.strategy.OrcamentoStrategy;
@@ -36,7 +37,7 @@ public class OrcamentoService {
     /**
      * Salva um orçamento no sistema.
      */
-    public Orcamento salvar(Orcamento orcamento, Long sinistroId, Long prestadorId, String tipoSinistro) {
+    public Orcamento salvar(Orcamento orcamento, Long sinistroId, Long prestadorId, TipoSinistro tipoSinistro) {
         // Busca o sinistro
         SinistroBase sinistro = sinistroService.buscarPorId(sinistroId, tipoSinistro);
         orcamento.setSinistro(sinistro);

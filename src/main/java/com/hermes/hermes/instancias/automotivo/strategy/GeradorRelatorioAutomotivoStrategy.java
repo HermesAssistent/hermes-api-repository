@@ -2,6 +2,7 @@ package com.hermes.hermes.instancias.automotivo.strategy;
 
 import com.hermes.hermes.framework.chat.domain.dtos.FotoDto;
 import com.hermes.hermes.framework.relatorio.domain.strategy.GeradorRelatorioStrategy;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.instancias.automotivo.domain.dtos.SinistroAutomotivoDto;
 import com.hermes.hermes.instancias.automotivo.domain.model.SinistroAutomotivo;
@@ -22,8 +23,8 @@ import java.util.List;
 public class GeradorRelatorioAutomotivoStrategy implements GeradorRelatorioStrategy {
 
     @Override
-    public boolean suporta(String tipoSinistro) {
-        return "automotivo".equalsIgnoreCase(tipoSinistro);
+    public boolean suporta(TipoSinistro tipoSinistro) {
+        return tipoSinistro.equals(TipoSinistro.AUTOMOTIVO);
     }
 
     @Override

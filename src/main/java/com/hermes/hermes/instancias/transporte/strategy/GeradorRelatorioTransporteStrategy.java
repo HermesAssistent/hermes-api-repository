@@ -1,7 +1,8 @@
 package com.hermes.hermes.instancias.transporte.strategy;
 
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.instancias.transporte.domain.dtos.SinistroTransporteDto;
-import com.hermes.hermes.instancias.transporte.domain.model.SinistroCarga;
+import com.hermes.hermes.instancias.transporte.domain.model.SinistroTransporte;
 import com.hermes.hermes.framework.chat.domain.dtos.FotoDto;
 import com.hermes.hermes.framework.relatorio.domain.strategy.GeradorRelatorioStrategy;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
@@ -22,9 +23,8 @@ import java.util.List;
 public class GeradorRelatorioTransporteStrategy implements GeradorRelatorioStrategy {
 
     @Override
-    public boolean suporta(String tipoSinistro) {
-        return "carga".equalsIgnoreCase(tipoSinistro) ||
-                "transporte".equalsIgnoreCase(tipoSinistro);
+    public boolean suporta(TipoSinistro tipoSinistro) {
+        return tipoSinistro.equals(TipoSinistro.TRANSPORTE);
     }
 
     @Override
@@ -34,8 +34,8 @@ public class GeradorRelatorioTransporteStrategy implements GeradorRelatorioStrat
 
     @Override
     public String gerarHtml(SinistroBase sinistro) {
-        SinistroCarga sinistroCarga = (SinistroCarga) sinistro;
-        SinistroTransporteDto dto = SinistroTransporteDto.fromEntity(sinistroCarga);
+        SinistroTransporte sinistroTransporte = (SinistroTransporte) sinistro;
+        SinistroTransporteDto dto = SinistroTransporteDto.fromEntity(sinistroTransporte);
 
         String html = "{{TEMPLATE}}"; // Será substituído pelo template real
         return preencherTemplate(html, dto);
