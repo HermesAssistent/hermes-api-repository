@@ -7,20 +7,22 @@ import com.hermes.hermes.framework.exception.NotFoundException;
 import com.hermes.hermes.framework.sinistro.domain.strategy.SinistroStrategy;
 import com.hermes.hermes.instancias.automotivo.repository.SinistroAutomotivoRepository;
 import com.hermes.hermes.framework.localizacao.service.GeocodingService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class SinistroAutomotivoStrategy implements SinistroStrategy {
-    private SinistroAutomotivoRepository sinistroRepository;
+    private final SinistroAutomotivoRepository sinistroRepository;
 
     @Override
     public SinistroAutomotivo criarSinistro(Map<String, Object> dados, GeocodingService geocodingService) {
         SinistroAutomotivo sinistro = new SinistroAutomotivo();
         sinistro.fromMap(dados, geocodingService);
         validar(sinistro);
-        return sinistroRepository.save(sinistro);
+        return sinistro;
     }
 
     @Override

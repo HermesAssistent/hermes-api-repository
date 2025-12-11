@@ -44,7 +44,7 @@ public class SinistroDomesticoDto implements SinistroBaseDto {
             return null;
         }
 
-        List<FotoDto> fotoDtos = entity.getFotos().stream()
+        List<FotoDto> fotoDtos = entity.getFotos() != null ? entity.getFotos().stream()
                 .map(foto -> {
                     FotoDto fotoDto = new FotoDto();
                     fotoDto.setId(foto.getId());
@@ -54,7 +54,7 @@ public class SinistroDomesticoDto implements SinistroBaseDto {
                     fotoDto.setSinistroId(foto.getSinistro() != null ? foto.getSinistro().getId() : null);
                     return fotoDto;
                 })
-                .toList();
+                .toList() : List.of();
 
         return SinistroDomesticoDto.builder()
                 .id(entity.getId())

@@ -100,11 +100,6 @@ public class Orcamento extends Entidade {
         return this.valorTotal;
     }
     
-    public void atualizarValorPecasAPartirDasPecas() {
-        calcularTotal();
-        this.dataAtualizacao = LocalDateTime.now();
-    }
-    
     public void aceitar() {
         this.status = StatusOrcamento.ACEITO;
         this.dataAtualizacao = LocalDateTime.now();
@@ -114,19 +109,6 @@ public class Orcamento extends Entidade {
         this.status = StatusOrcamento.REVISADO;
         this.observacoes = observacoes;
         this.dataAtualizacao = LocalDateTime.now();
-    }
-    
-    public void rejeitar(String motivo) {
-        this.status = StatusOrcamento.REJEITADO;
-        this.observacoes = motivo;
-        this.dataAtualizacao = LocalDateTime.now();
-    }
-    
-    public boolean isValido() {
-        return sinistro != null &&
-               prestador != null &&
-               valorTotal != null &&
-               valorTotal.compareTo(BigDecimal.ZERO) >= 0;
     }
     
     @PreUpdate

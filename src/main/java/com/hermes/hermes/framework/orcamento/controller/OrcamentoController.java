@@ -84,8 +84,6 @@ public class OrcamentoController {
         return ResponseEntity.ok(list);
     }
     
-    // ========== GERENCIAMENTO DE ITENS ==========
-    
     @PostMapping("/{orcamentoId}/itens")
     public ResponseEntity<OrcamentoResponseDto> adicionarItem(
             @PathVariable Long orcamentoId,
@@ -143,6 +141,31 @@ public class OrcamentoController {
         return ResponseEntity.ok(mapToNovoResponseDto(orcamento));
     }
 
+    @GetMapping
+    public ResponseEntity<List<OrcamentoResponseDto>> listarTodos() {
+        List<OrcamentoResponseDto> list = orcamentoService.listarTodos().stream()
+                .map(this::mapToNovoResponseDto)
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<OrcamentoResponseDto>> listarPorCliente(@PathVariable Long clienteId) {
+        List<OrcamentoResponseDto> list = orcamentoService.listarPorCliente(clienteId).stream()
+                .map(this::mapToNovoResponseDto)
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<OrcamentoResponseDto> atualizarStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
+        StatusOrcamento novoStatus = StatusOrcamento.valueOf(status.toUpperCase());
+        Orcamento atualizado = orcamentoService.atualizarStatus(id, novoStatus);
+        return ResponseEntity.ok(mapToNovoResponseDto(atualizado));
+    }
+
     private OrcamentoResponseDto mapToNovoResponseDto(Orcamento orcamento) {
         List<OrcamentoResponseDto.ItemOrcamentoResponseDto> itensDto = null;
         if (orcamento.getItens() != null) {
@@ -192,8 +215,6 @@ public class OrcamentoController {
         };
     }
     
-    // ========== MAPPERS AUTOMOTIVO ==========
-    
     private Peca criarPeca(OrcamentoRequestDto.ItemOrcamentoRequestDto dto) {
         Peca peca = new Peca();
         peca.setCodigo(dto.getCodigo());
@@ -216,8 +237,6 @@ public class OrcamentoController {
         return maoDeObra;
     }
     
-    // ========== MAPPERS DOMÉSTICO ==========
-    
     private Material criarMaterial(OrcamentoRequestDto.ItemOrcamentoRequestDto dto) {
         Material material = new Material();
         material.setDescricao(dto.getDescricao());
@@ -239,8 +258,6 @@ public class OrcamentoController {
         servico.setQuantidade(dto.getQuantidade());
         return servico;
     }
-    
-    // ========== MAPPERS TRANSPORTE ==========
     
     private CustoPericial criarCustoPericial(OrcamentoRequestDto.ItemOrcamentoRequestDto dto) {
         CustoPericial custo = new CustoPericial();
@@ -287,6 +304,32 @@ public class OrcamentoController {
         }
         
         return custo;
+    }
+
+    @PostMapping("/gerar-automatico")
+    public ResponseEntity<OrcamentoResponseDto> gerarOrcamentoAutomatico(
+            @RequestParam Long sinistroId,
+            @RequestParam(required = false) Long prestadorId,
+            @RequestParam String tipoSinistro) {
+        log.info("Gerando orçamento automático para sinistro {} do tipo {}", sinistroId, tipoSinistro);
+        
+        Orcamento orcamento = orcamentoService.gerarOrcamentoAutomatico(sinistroId, prestadorId, tipoSinistro);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapToNovoResponseDto(orcamento));
+    }
+
+    @GetMapping("/estimar-custos")
+    public ResponseEntity<java.util.Map<String, Object>> estimarCustos(
+            @RequestParam Long sinistroId,
+            @RequestParam String tipoSinistro) {
+        log.info("Estimando custos para sinistro {} do tipo {}", sinistroId, tipoSinistro);
+        
+        java.math.BigDecimal custoEstimado = orcamentoService.calcularCustosEstimados(sinistroId, tipoSinistro);
+        
+        return ResponseEntity.ok(java.util.Map.of(
+            "sinistroId", sinistroId,
+            "tipoSinistro", tipoSinistro,
+            "custoEstimado", custoEstimado
+        ));
     }
 
 }

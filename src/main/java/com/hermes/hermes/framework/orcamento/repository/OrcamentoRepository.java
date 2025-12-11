@@ -12,22 +12,10 @@ import java.util.List;
 @Repository
 public interface OrcamentoRepository extends JpaRepository<Orcamento, Long> {
     
-    //Busca orçamentos por ID do sinistro.
     List<Orcamento> findBySinistroId(Long sinistroId);
 
-    //Busca orçamentos por ID do prestador.
-    List<Orcamento> findByPrestadorId(Long prestadorId);
-
-    //Busca orçamentos por cliente através do sinistro.
-    @Query("SELECT o FROM OrcamentoOficina o WHERE o.sinistro.cliente.id = :clienteId")
+    @Query("SELECT o FROM Orcamento o WHERE o.sinistro.cliente.id = :clienteId")
     List<Orcamento> findBySinistroClienteId(@Param("clienteId") Long clienteId);
     
-    //Busca orçamentos por status.
     List<Orcamento> findByStatus(StatusOrcamento status);
-
-    //Busca orçamentos pendentes de um sinistro específico.
-    List<Orcamento> findBySinistroIdAndStatus(Long sinistroId, StatusOrcamento status);
-
-    //Busca orçamentos de um prestador por status.
-    List<Orcamento> findByPrestadorIdAndStatus(Long prestadorId, StatusOrcamento status);
 }
