@@ -8,11 +8,4 @@ import java.util.List;
 
 @Repository
 public interface SinistroTransporteRepository extends JpaRepository<SinistroTransporte, Long> {
-    List<SinistroTransporte> findAllByCliente_IdIs(Long clienteId);
-    Long countByPerdaTotalTrue();
-    Long countByCargaRecuperadaTrue();
-    Long countByPossuiSeguroTrue();
-    Long countByGravidadeEqualsIgnoreCase(String gravidade);
-    List<SinistroTransporte> findByTransportadora(String transportadora);
-    List<SinistroTransporte> findByTipoOcorrencia(String tipoOcorrencia);
 }

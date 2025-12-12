@@ -38,6 +38,7 @@ public class SinistroAutomotivoDto implements SinistroBaseDto {
     private String categoriaProblema;
 
     private List<FotoDto> fotos;
+    private String tipo;
 
     public static SinistroAutomotivoDto fromEntity(SinistroAutomotivo entity) {
         if (entity == null) {
@@ -77,6 +78,7 @@ public class SinistroAutomotivoDto implements SinistroBaseDto {
                 .veiculoImobilizado(entity.getVeiculoImobilizado())
                 .categoriaProblema(entity.getCategoriaProblema())
                 .fotos(fotoDtos)
+                .tipo(entity.getTipo().name())
                 .build();
     }
 }

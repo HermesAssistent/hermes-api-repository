@@ -1,5 +1,6 @@
 package com.hermes.hermes.instancias.automotivo.domain.model;
 
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.instancias.automotivo.domain.dtos.SinistroAutomotivoDto;
 import com.hermes.hermes.framework.sinistro.domain.dtos.SinistroBaseDto;
 import com.hermes.hermes.framework.localizacao.domain.model.Localizacao;
@@ -50,6 +51,9 @@ public class SinistroAutomotivo extends SinistroBase {
                 this.setLocalizacao(localizacao);
             } catch (Exception e) {
                 System.err.println("Erro ao obter localização: " + e.getMessage());
+                Localizacao localizacao = new Localizacao();
+                localizacao.setEndereco(cep);
+                this.setLocalizacao(localizacao);
             }
         }
 
@@ -106,6 +110,8 @@ public class SinistroAutomotivo extends SinistroBase {
 
         if (map.containsKey("categoria_problema") && map.get("categoria_problema") != null)
             this.setCategoriaProblema(map.get("categoria_problema").toString());
+
+        this.setTipo(TipoSinistro.AUTOMOTIVO);
     }
 
 
@@ -131,6 +137,7 @@ public class SinistroAutomotivo extends SinistroBase {
                 ", autoridadesAcionadas='" + autoridadesAcionadas + '\'' +
                 ", veiculoImobilizado='" + veiculoImobilizado + '\'' +
                 ", categoriaProblema='" + getCategoriaProblema() + '\'' +
+                ", tipoSinistro='" + getTipo() + '\'' +
                 '}';
     }
 

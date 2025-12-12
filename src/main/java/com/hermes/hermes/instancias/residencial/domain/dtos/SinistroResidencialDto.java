@@ -39,6 +39,8 @@ public class SinistroResidencialDto implements SinistroBaseDto {
 
     private List<FotoDto> fotos;
 
+    private String tipo;
+
     public static SinistroResidencialDto fromEntity(SinistroResidencial entity) {
         if (entity == null) {
             return null;
@@ -77,6 +79,7 @@ public class SinistroResidencialDto implements SinistroBaseDto {
                 .testemunhas(entity.getTestemunhas())
                 .autoridadesAcionadas(entity.getAutoridadesAcionadas())
                 .fotos(fotoDtos)
+                .tipo(entity.getTipo().name())
                 .build();
     }
 }

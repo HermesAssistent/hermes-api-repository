@@ -1,6 +1,7 @@
 package com.hermes.hermes.framework.sinistro.controller;
 
 import com.hermes.hermes.framework.sinistro.domain.dtos.SinistroBaseDto;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.framework.sinistro.service.SinistroService;
 import lombok.RequiredArgsConstructor;

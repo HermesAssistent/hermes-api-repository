@@ -45,6 +45,7 @@ public class SinistroTransporteDto implements SinistroBaseDto {
     private String gravidade;
     private String testemunhas;
     private String autoridadesAcionadas;
+    private String tipo;
 
     private List<FotoDto> fotos;
 
@@ -95,6 +96,7 @@ public class SinistroTransporteDto implements SinistroBaseDto {
                 .testemunhas(entity.getTestemunhas())
                 .autoridadesAcionadas(entity.getAutoridadesAcionadas())
                 .fotos(fotoDtos)
+                .tipo(entity.getTipo().name())
                 .build();
     }
 }

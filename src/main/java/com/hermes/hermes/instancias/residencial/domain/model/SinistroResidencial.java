@@ -3,6 +3,7 @@ package com.hermes.hermes.instancias.residencial.domain.model;
 import com.hermes.hermes.framework.localizacao.domain.model.Localizacao;
 import com.hermes.hermes.framework.localizacao.service.GeocodingService;
 import com.hermes.hermes.framework.sinistro.domain.dtos.SinistroBaseDto;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.instancias.residencial.domain.dtos.SinistroResidencialDto;
 import jakarta.persistence.*;
@@ -50,12 +51,14 @@ public class SinistroResidencial extends SinistroBase {
             String endereco = map.get("endereco").toString();
             s.setEndereco(endereco);
 
-            // Tentar obter coordenadas do endereço
             try {
                 Localizacao localizacao = geocodingService.getCoordinates(endereco);
                 s.setLocalizacao(localizacao);
             } catch (Exception e) {
                 System.err.println("Erro ao obter localização: " + e.getMessage());
+                Localizacao localizacao = new Localizacao();
+                localizacao.setEndereco(endereco);
+                s.setLocalizacao(localizacao);
             }
         }
 
@@ -107,6 +110,8 @@ public class SinistroResidencial extends SinistroBase {
         if (map.containsKey("categoria_problema") && map.get("categoria_problema") != null)
             s.setCategoriaProblema(map.get("categoria_problema").toString());
 
+        s.setTipo(TipoSinistro.RESIDENCIAL);
+
         return s;
     }
 
@@ -131,6 +136,7 @@ public class SinistroResidencial extends SinistroBase {
                 ", testemunhas='" + testemunhas + '\'' +
                 ", autoridadesAcionadas='" + autoridadesAcionadas + '\'' +
                 ", categoriaProblema='" + getCategoriaProblema() + '\'' +
+                ", tipoSinistro='" + getTipo() + '\'' +
                 '}';
     }
 

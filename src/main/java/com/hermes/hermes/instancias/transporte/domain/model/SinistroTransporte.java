@@ -2,6 +2,7 @@ package com.hermes.hermes.instancias.transporte.domain.model;
 import com.hermes.hermes.framework.localizacao.domain.model.Localizacao;
 import com.hermes.hermes.framework.localizacao.service.GeocodingService;
 import com.hermes.hermes.framework.sinistro.domain.dtos.SinistroBaseDto;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import com.hermes.hermes.framework.sinistro.domain.model.SinistroBase;
 import com.hermes.hermes.instancias.transporte.domain.dtos.SinistroTransporteDto;
 import jakarta.persistence.*;
@@ -55,12 +56,14 @@ public class SinistroTransporte extends SinistroBase {
         if (map.containsKey("local") && map.get("local") != null) {
             String local = map.get("local").toString();
 
-            // Tentar obter coordenadas do local
             try {
                 Localizacao localizacao = geocodingService.getCoordinates(local);
                 s.setLocalizacao(localizacao);
             } catch (Exception e) {
                 System.err.println("Erro ao obter localização: " + e.getMessage());
+                Localizacao localizacao = new Localizacao();
+                localizacao.setEndereco(local);
+                s.setLocalizacao(localizacao);
             }
         }
 
@@ -139,6 +142,8 @@ public class SinistroTransporte extends SinistroBase {
         if (map.containsKey("categoria_problema") && map.get("categoria_problema") != null)
             s.setCategoriaProblema(map.get("categoria_problema").toString());
 
+        s.setTipo(TipoSinistro.TRANSPORTE);
+
         return s;
     }
 
@@ -172,6 +177,7 @@ public class SinistroTransporte extends SinistroBase {
                 ", testemunhas='" + testemunhas + '\'' +
                 ", autoridadesAcionadas='" + autoridadesAcionadas + '\'' +
                 ", categoriaProblema='" + getCategoriaProblema() + '\'' +
+                ", tipoSinistro='" + getTipo() + '\'' +
                 '}';
     }
 

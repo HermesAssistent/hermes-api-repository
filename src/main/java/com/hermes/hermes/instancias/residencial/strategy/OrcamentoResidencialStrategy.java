@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class OrcamentoDomesticoStrategy extends AbstractOrcamentoStrategy {
+public class OrcamentoResidencialStrategy extends AbstractOrcamentoStrategy {
     
     @Override
     public List<ItemOrcamento> criarItensOrcamento(SinistroBase sinistro) {

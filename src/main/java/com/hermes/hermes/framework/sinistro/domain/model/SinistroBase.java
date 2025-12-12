@@ -4,6 +4,7 @@ import com.hermes.hermes.framework.sinistro.domain.dtos.SinistroBaseDto;
 import com.hermes.hermes.framework.abstracts.Entidade;
 import com.hermes.hermes.framework.chat.domain.model.Foto;
 import com.hermes.hermes.framework.cliente.domain.model.Cliente;
+import com.hermes.hermes.framework.sinistro.domain.enums.TipoSinistro;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,8 @@ public abstract class SinistroBase extends Entidade {
     private String data;
     private String hora;
     private String categoriaProblema;
+    @Enumerated(EnumType.STRING)
+    private TipoSinistro tipo;
 
     @OneToMany(mappedBy = "sinistro", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Foto> fotos;
